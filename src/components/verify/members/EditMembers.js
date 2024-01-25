@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Accordion,
@@ -35,6 +35,8 @@ import {
 import ConfirmDialogEdit from "../ConfirmDialogEdit";
 import dayjs from "dayjs";
 import { DatePicker, Space } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { onGenderList } from "../../../network/actions/genders";
 
 export default function EditMembers({ memberObject }) {
   const [expanded, setExpanded] = useState(false);
@@ -51,6 +53,34 @@ export default function EditMembers({ memberObject }) {
   const [changedValues, setChangedValues] = useState({});
 
   console.log("Gender", memberObject.gender);
+  /**
+   * Gender List
+   */
+  const [genderList, setGenderList] = useState([]);
+  const dispatch = useDispatch();
+  const gender_reducer = useSelector((state) => state.gender);
+
+  useEffect(() => {
+    let genderList = [];
+
+    if (gender_reducer?.data) {
+      const { data, status, message } = gender_reducer.data || {};
+      // setdistrictCalled(false);
+
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            id: data[i].id,
+            genderName: data[i].genderName,
+          };
+          console.log("object", object);
+          genderList.push(object);
+        }
+        setGenderList(genderList);
+      }
+    }
+  }, [gender_reducer]);
+
   /**
    * Handle Save
    * Save the Edited Data to Service
@@ -87,6 +117,7 @@ export default function EditMembers({ memberObject }) {
     setOpenDialog(false);
     setExpanded(true);
     setIsEditMode(true);
+    dispatch(onGenderList());
   };
 
   const handleCancelEdit = () => {
@@ -143,14 +174,7 @@ export default function EditMembers({ memberObject }) {
         );
       } else if (key === "gender") {
         // Define options for each select field
-        const options = {
-          gender: [
-            { id: 0, genderName: "-" },
-            { id: 1, genderName: "Male" },
-            { id: 2, genderName: "Female" },
-            { id: 3, genderName: "Others" },
-          ],
-        };
+        console.log("List", genderList);
 
         return (
           <FormControl fullWidth>
@@ -171,7 +195,7 @@ export default function EditMembers({ memberObject }) {
                 }));
               }}
             >
-              {options.gender.map((option) => (
+              {genderList.map((option) => (
                 <MenuItem key={option.id} value={option.genderName}>
                   {option.genderName}
                 </MenuItem>
