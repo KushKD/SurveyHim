@@ -42,11 +42,15 @@ export default function EditMembers({ memberObject }) {
   const [editableMemberObject, setEditableMemberObject] = useState({
     memberObject,
   });
+  const [selectedGenderName, setSelectedGenderName] = useState(
+    memberObject.gender
+  ); // Initialize with a default value
 
   const [openDialog, setOpenDialog] = useState(false);
   const [memberToEdit, setMemberToEdit] = useState(null);
   const [changedValues, setChangedValues] = useState({});
 
+  console.log("Gender", memberObject.gender);
   /**
    * Handle Save
    * Save the Edited Data to Service
@@ -137,44 +141,45 @@ export default function EditMembers({ memberObject }) {
             </Space>
           </>
         );
-      }
-      // } else if (
-      //   key === "religion" ||
-      //   key === "relativeName" ||
-      //   key === "gender" ||
-      //   key === "educationQualification"
-      // ) {
-      //   // Define options for each select field
-      //   const options = {
-      //     religion: ["Religion1", "Religion2", "Religion3"], // Replace with actual options
-      //     relativeName: ["Relative1", "Relative2", "Relative3"], // Replace with actual options
-      //     gender: ["Male", "Female", "Other"],
-      //     educationQualification: ["Primary", "Secondary", "Higher", "College"],
-      //   };
+      } else if (key === "gender") {
+        // Define options for each select field
+        const options = {
+          gender: [
+            { id: 0, genderName: "-" },
+            { id: 1, genderName: "Male" },
+            { id: 2, genderName: "Female" },
+            { id: 3, genderName: "Others" },
+          ],
+        };
 
-      //   return (
-      //     <FormControl fullWidth>
-      //       <InputLabel>{key}</InputLabel>
-      //       <Select
-      //         value={currentValue}
-      //         label={key}
-      //         onChange={(e) => {
-      //           setChangedValues((prevValues) => ({
-      //             ...prevValues,
-      //             [key]: e.target.value,
-      //           }));
-      //         }}
-      //       >
-      //         {options[key].map((option, index) => (
-      //           <MenuItem key={index} value={option}>
-      //             {option}
-      //           </MenuItem>
-      //         ))}
-      //       </Select>
-      //     </FormControl>
-      //   );
-      // }
-      else {
+        return (
+          <FormControl fullWidth>
+            <InputLabel>{key}</InputLabel>
+            <Select
+              value={selectedGenderName}
+              label={key}
+              onChange={(e) => {
+                const newName = e.target.value;
+                setSelectedGenderName(newName); // Update the state variable when a new selection is made
+
+                const newId =
+                  options.gender.find((option) => option.genderName === newName)
+                    ?.id || null;
+                setChangedValues((prevValues) => ({
+                  ...prevValues,
+                  [key]: { id: newId, genderName: newName },
+                }));
+              }}
+            >
+              {options.gender.map((option) => (
+                <MenuItem key={option.id} value={option.genderName}>
+                  {option.genderName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      } else {
         return (
           <TextField
             key={key}
