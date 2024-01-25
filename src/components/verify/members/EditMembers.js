@@ -37,6 +37,9 @@ import dayjs from "dayjs";
 import { DatePicker, Space } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { onGenderList } from "../../../network/actions/genders";
+import { onRelationList } from "../../../network/actions/relations";
+import { onQualificationsList } from "../../../network/actions/qualifications";
+import { onOccupationList } from "../../../network/actions/occupations";
 
 export default function EditMembers({ memberObject }) {
   const [expanded, setExpanded] = useState(false);
@@ -44,25 +47,25 @@ export default function EditMembers({ memberObject }) {
   const [editableMemberObject, setEditableMemberObject] = useState({
     memberObject,
   });
-  const [selectedGenderName, setSelectedGenderName] = useState(
-    memberObject.gender
-  ); // Initialize with a default value
 
   const [openDialog, setOpenDialog] = useState(false);
   const [memberToEdit, setMemberToEdit] = useState(null);
   const [changedValues, setChangedValues] = useState({});
+
+  const dispatch = useDispatch();
 
   console.log("Gender", memberObject.gender);
   /**
    * Gender List
    */
   const [genderList, setGenderList] = useState([]);
-  const dispatch = useDispatch();
   const gender_reducer = useSelector((state) => state.gender);
+  const [selectedGenderName, setSelectedGenderName] = useState(
+    memberObject.gender
+  ); // Initialize with a default value
 
   useEffect(() => {
     let genderList = [];
-
     if (gender_reducer?.data) {
       const { data, status, message } = gender_reducer.data || {};
       // setdistrictCalled(false);
@@ -82,6 +85,98 @@ export default function EditMembers({ memberObject }) {
   }, [gender_reducer]);
 
   /**
+   * Relations List
+   */
+  const [relationsList, setRelationsList] = useState([]);
+  const relations_reducer = useSelector((state) => state.relations);
+  const [selectedRelationName, setSelectedRelationName] = useState(
+    memberObject.relation
+  );
+
+  useEffect(() => {
+    let relationList = [];
+
+    if (relations_reducer?.data) {
+      const { data, status, message } = relations_reducer.data || {};
+      // setdistrictCalled(false);
+
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            id: data[i].id,
+            relationNameEnglish: data[i].relationNameEnglish,
+          };
+          console.log("object", object);
+          relationList.push(object);
+        }
+        setRelationsList(relationList);
+      }
+    }
+  }, [relations_reducer]);
+
+  /**
+   * onQualificationsList
+   * Qualifications
+   */
+  const [qualificationList, setQualificationList] = useState([]);
+  const qualifications_reducer = useSelector((state) => state.qualifications);
+  const [selectedQualification, setSelectedQualification] = useState(
+    memberObject.educationQualification
+  );
+
+  useEffect(() => {
+    let qualificationList = [];
+
+    if (qualifications_reducer?.data) {
+      const { data, status, message } = qualifications_reducer.data || {};
+      // setdistrictCalled(false);
+
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            id: data[i].id,
+            educationQualificationEnglish:
+              data[i].educationQualificationEnglish,
+          };
+          console.log("object", object);
+          qualificationList.push(object);
+        }
+        setQualificationList(qualificationList);
+      }
+    }
+  }, [qualifications_reducer]);
+
+  /**
+   * Occupation List
+   */
+  const [occupationList, setOccupationList] = useState([]);
+  const occupation_reducer = useSelector((state) => state.occupations);
+  const [selectedOccupation, setSelectedOccupation] = useState(
+    memberObject.occupation
+  );
+
+  useEffect(() => {
+    let occupationList = [];
+
+    if (occupation_reducer?.data) {
+      const { data, status, message } = occupation_reducer.data || {};
+      // setdistrictCalled(false);
+
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            id: data[i].id,
+            professionName: data[i].professionName,
+          };
+          console.log("object", object);
+          occupationList.push(object);
+        }
+        setOccupationList(occupationList);
+      }
+    }
+  }, [occupation_reducer]);
+
+  /**
    * Handle Save
    * Save the Edited Data to Service
    */
@@ -95,10 +190,7 @@ export default function EditMembers({ memberObject }) {
     }
 
     const updatedMemberData = { ...memberObject, ...changedValues };
-    //setMemberData(updatedMemberData);
     console.log("Updated Member Data:", updatedMemberData);
-
-    // Optionally reset changedValues or handle further actions
     setChangedValues({});
   };
 
@@ -118,6 +210,9 @@ export default function EditMembers({ memberObject }) {
     setExpanded(true);
     setIsEditMode(true);
     dispatch(onGenderList());
+    dispatch(onRelationList());
+    dispatch(onQualificationsList());
+    dispatch(onOccupationList());
   };
 
   const handleCancelEdit = () => {
@@ -131,96 +226,207 @@ export default function EditMembers({ memberObject }) {
     setChangedValues({});
   };
 
-  // Function to render member fields
   const renderMemberFields = (key, value) => {
-    // Use the value from changedValues if it exists, otherwise use the initialValue
+    // Use the value from changedValues if it exists, otherwise use the value
     const currentValue =
       changedValues[key] !== undefined ? changedValues[key] : value;
 
     if (isEditMode) {
-      if (key === "dateOfBirth") {
-        return (
-          <>
-            <Space direction="vertical">
-              <DatePicker
-                key={key}
+      switch (key) {
+        case "dateOfBirth":
+          return (
+            <>
+              <Space direction="vertical">
+                <DatePicker
+                  key={key}
+                  label={key}
+                  defaultValue={value ? dayjs(value, "DD-MM-YYYY") : null}
+                  format="DD-MM-YYYY"
+                  disabledDate={(current) => {
+                    return current && current > dayjs().endOf("day");
+                  }}
+                  onChange={(date, dateString) => {
+                    if (date) {
+                      setChangedValues((prevValues) => ({
+                        ...prevValues,
+                        [key]: dateString,
+                      }));
+                    } else {
+                      setChangedValues((prevValues) => ({
+                        ...prevValues,
+                        [key]: null,
+                      }));
+                    }
+                  }}
+                />
+              </Space>
+            </>
+          );
+
+        case "gender":
+          console.log("List", genderList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedGenderName}
                 label={key}
-                //value={value ? moment(value, "DD-MM-YYYY") : null}
-                defaultValue={value ? dayjs(value, "DD-MM-YYYY") : null}
-                format="DD-MM-YYYY"
-                //disable future dates
-                disabledDate={(current) => {
-                  // Disable dates after today
-                  return current && current > dayjs().endOf("day");
-                }}
-                onChange={(date, dateString) => {
-                  console.log("Selected Date: ", date);
-                  console.log("Formatted Date String: ", dateString);
-                  if (date) {
-                    setChangedValues((prevValues) => ({
-                      ...prevValues,
-                      [key]: dateString, // Use dateString directly
-                    }));
-                  } else {
-                    setChangedValues((prevValues) => ({
-                      ...prevValues,
-                      [key]: null,
-                    }));
-                  }
-                }}
-              />
-            </Space>
-          </>
-        );
-      } else if (key === "gender") {
-        // Define options for each select field
-        console.log("List", genderList);
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedGenderName(newName);
 
-        return (
-          <FormControl fullWidth>
-            <InputLabel>{key}</InputLabel>
-            <Select
-              value={selectedGenderName}
+                  const newId =
+                    options.gender.find(
+                      (option) => option.genderName === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: { id: newId, genderName: newName },
+                  }));
+                }}
+              >
+                {genderList.map((option) => (
+                  <MenuItem key={option.id} value={option.genderName}>
+                    {option.genderName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+
+        case "aadhaarNumber":
+          return (
+            <TextField
+              key={key}
               label={key}
+              disabled={true}
+              value={currentValue}
               onChange={(e) => {
-                const newName = e.target.value;
-                setSelectedGenderName(newName); // Update the state variable when a new selection is made
-
-                const newId =
-                  options.gender.find((option) => option.genderName === newName)
-                    ?.id || null;
                 setChangedValues((prevValues) => ({
                   ...prevValues,
-                  [key]: { id: newId, genderName: newName },
+                  [key]: e.target.value,
                 }));
               }}
-            >
-              {genderList.map((option) => (
-                <MenuItem key={option.id} value={option.genderName}>
-                  {option.genderName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        );
-      } else {
-        return (
-          <TextField
-            key={key}
-            label={key}
-            value={currentValue}
-            onChange={(e) => {
-              const newValue = e.target.value;
-              setChangedValues((prevValues) => ({
-                ...prevValues,
-                [key]: e.target.value,
-              }));
-            }}
-          />
-        );
+            />
+          );
+
+        case "relation":
+          console.log("List", relationsList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedRelationName}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedRelationName(newName);
+
+                  const newId =
+                    options.relation.find(
+                      (option) => option.relationNameEnglish === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: { id: newId, relationNameEnglish: newName },
+                  }));
+                }}
+              >
+                {relationsList.map((option) => (
+                  <MenuItem key={option.id} value={option.relationNameEnglish}>
+                    {option.relationNameEnglish}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        case "educationQualification":
+          console.log("List", qualificationList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedQualification}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedQualification(newName);
+
+                  const newId =
+                    options.educationQualification.find(
+                      (option) =>
+                        option.educationQualificationEnglish === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      id: newId,
+                      educationQualificationEnglish: newName,
+                    },
+                  }));
+                }}
+              >
+                {qualificationList.map((option) => (
+                  <MenuItem
+                    key={option.id}
+                    value={option.educationQualificationEnglish}
+                  >
+                    {option.educationQualificationEnglish}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        case "occupation":
+          console.log("List", occupationList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedOccupation}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedOccupation(newName);
+
+                  const newId =
+                    options.occupation.find(
+                      (option) => option.professionName === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      id: newId,
+                      professionName: newName,
+                    },
+                  }));
+                }}
+              >
+                {occupationList.map((option) => (
+                  <MenuItem key={option.id} value={option.professionName}>
+                    {option.professionName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        default:
+          return (
+            <TextField
+              key={key}
+              label={key}
+              value={currentValue}
+              onChange={(e) => {
+                setChangedValues((prevValues) => ({
+                  ...prevValues,
+                  [key]: e.target.value,
+                }));
+              }}
+            />
+          );
       }
     } else {
-      return <Typography key={key}>{`${key}: ${initialValue}`}</Typography>;
+      return <Typography key={key}>{`${key}: ${value}`}</Typography>;
     }
   };
 
