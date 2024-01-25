@@ -54,7 +54,7 @@ export default function EditMembers({ memberObject }) {
 
   const dispatch = useDispatch();
 
-  console.log("Gender", memberObject.gender);
+  //console.log("Gender", memberObject.gender);
   /**
    * Gender List
    */
@@ -76,7 +76,7 @@ export default function EditMembers({ memberObject }) {
             id: data[i].id,
             genderName: data[i].genderName,
           };
-          console.log("object", object);
+          // console.log("object", object);
           genderList.push(object);
         }
         setGenderList(genderList);
@@ -106,7 +106,7 @@ export default function EditMembers({ memberObject }) {
             id: data[i].id,
             relationNameEnglish: data[i].relationNameEnglish,
           };
-          console.log("object", object);
+          //console.log("object", object);
           relationList.push(object);
         }
         setRelationsList(relationList);
@@ -138,7 +138,7 @@ export default function EditMembers({ memberObject }) {
             educationQualificationEnglish:
               data[i].educationQualificationEnglish,
           };
-          console.log("object", object);
+          // console.log("object", object);
           qualificationList.push(object);
         }
         setQualificationList(qualificationList);
@@ -168,7 +168,7 @@ export default function EditMembers({ memberObject }) {
             id: data[i].id,
             professionName: data[i].professionName,
           };
-          console.log("object", object);
+          // console.log("object", object);
           occupationList.push(object);
         }
         setOccupationList(occupationList);
@@ -226,7 +226,7 @@ export default function EditMembers({ memberObject }) {
     setChangedValues({});
   };
 
-  const renderMemberFields = (key, value) => {
+  const renderMemberFields = (key, value, options = {}) => {
     // Use the value from changedValues if it exists, otherwise use the value
     const currentValue =
       changedValues[key] !== undefined ? changedValues[key] : value;
@@ -264,7 +264,7 @@ export default function EditMembers({ memberObject }) {
           );
 
         case "gender":
-          console.log("List", genderList);
+          //console.log("List", genderList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
@@ -302,16 +302,19 @@ export default function EditMembers({ memberObject }) {
               disabled={true}
               value={currentValue}
               onChange={(e) => {
-                setChangedValues((prevValues) => ({
-                  ...prevValues,
-                  [key]: e.target.value,
-                }));
+                // Limit input to 10 characters
+                if (e.target.value.length <= 12) {
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: e.target.value,
+                  }));
+                }
               }}
             />
           );
 
         case "relation":
-          console.log("List", relationsList);
+          // console.log("List", relationsList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
@@ -341,7 +344,7 @@ export default function EditMembers({ memberObject }) {
             </FormControl>
           );
         case "educationQualification":
-          console.log("List", qualificationList);
+          //console.log("List", qualificationList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
@@ -378,7 +381,7 @@ export default function EditMembers({ memberObject }) {
             </FormControl>
           );
         case "occupation":
-          console.log("List", occupationList);
+          // console.log("List", occupationList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
@@ -409,6 +412,25 @@ export default function EditMembers({ memberObject }) {
                 ))}
               </Select>
             </FormControl>
+          );
+        case "mobileNumber":
+          // console.log("List", occupationList);
+          return (
+            <TextField
+              key={key}
+              label={key}
+              type="number"
+              value={currentValue}
+              onChange={(e) => {
+                // Limit input to 10 characters
+                if (e.target.value.length <= 10) {
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: e.target.value,
+                  }));
+                }
+              }}
+            />
           );
         default:
           return (
@@ -614,7 +636,12 @@ export default function EditMembers({ memberObject }) {
                       }}
                     >
                       {isEditMode ? (
-                        renderMemberFields(key, value?.toString())
+                        renderMemberFields(key, value?.toString(), {
+                          gender: genderList,
+                          relation: relationsList,
+                          occupation: occupationList,
+                          educationQualification: qualificationList,
+                        })
                       ) : key === "aadhaarNumber" ? (
                         `XXXX-XXXX-${value.toString().slice(-4)}`
                       ) : typeof value === "boolean" ? (
