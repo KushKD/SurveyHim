@@ -7,7 +7,11 @@ import {
   Box,
   Button,
   Chip,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -29,7 +33,8 @@ import {
   Visibility,
 } from "@mui/icons-material";
 import ConfirmDialogEdit from "../ConfirmDialogEdit";
-
+import dayjs from "dayjs";
+import { DatePicker, Space } from "antd";
 
 export default function EditMembers({ memberObject }) {
   const [expanded, setExpanded] = useState(false);
@@ -43,7 +48,7 @@ export default function EditMembers({ memberObject }) {
   const [changedValues, setChangedValues] = useState({});
 
   /**
-   * Handle Save 
+   * Handle Save
    * Save the Edited Data to Service
    */
   const handleSaveChanges = () => {
@@ -55,7 +60,7 @@ export default function EditMembers({ memberObject }) {
       return;
     }
 
-    const updatedMemberData = {...memberObject, ...changedValues};
+    const updatedMemberData = { ...memberObject, ...changedValues };
     //setMemberData(updatedMemberData);
     console.log("Updated Member Data:", updatedMemberData);
 
@@ -73,7 +78,7 @@ export default function EditMembers({ memberObject }) {
     setOpenDialog(true);
   };
 
-  const handleConfirmEdit = ({editableMemberObject}) => {
+  const handleConfirmEdit = ({ editableMemberObject }) => {
     //console.log("Edit Object", editableMemberObject);
     setOpenDialog(false);
     setExpanded(true);
@@ -92,37 +97,103 @@ export default function EditMembers({ memberObject }) {
   };
 
   // Function to render member fields
-  const renderMemberFields = (key,value) => {
+  const renderMemberFields = (key, value) => {
     // Use the value from changedValues if it exists, otherwise use the initialValue
-  const currentValue = changedValues[key] !== undefined ? changedValues[key] : value;
+    const currentValue =
+      changedValues[key] !== undefined ? changedValues[key] : value;
 
-  //console.log(key,"===" ,value);
-  if (isEditMode) {
-    return (
-      <TextField
-        key={key}
-        label={key}
-        value={currentValue}
-        onChange={(e) => {
-          const newValue = e.target.value;
-          setChangedValues(prevValues => ({
-            ...prevValues,
-            [key]: e.target.value
-          }));
-          // setChangedValues(prevValues => {
-          //   const updatedValues = { ...prevValues, [key]: newValue };
-          //   console.log("Changed values:", updatedValues);
-          //   return updatedValues;
-          // });
-        }}
-      />
-    );
-  } else {
-    return <Typography key={key}>{`${key}: ${initialValue}`}</Typography>;
-  }
-    // });
+    if (isEditMode) {
+      if (key === "dateOfBirth") {
+        return (
+          <>
+            <Space direction="vertical">
+              <DatePicker
+                key={key}
+                label={key}
+                //value={value ? moment(value, "DD-MM-YYYY") : null}
+                defaultValue={value ? dayjs(value, "DD-MM-YYYY") : null}
+                format="DD-MM-YYYY"
+                //disable future dates
+                disabledDate={(current) => {
+                  // Disable dates after today
+                  return current && current > dayjs().endOf("day");
+                }}
+                onChange={(date, dateString) => {
+                  console.log("Selected Date: ", date);
+                  console.log("Formatted Date String: ", dateString);
+                  if (date) {
+                    setChangedValues((prevValues) => ({
+                      ...prevValues,
+                      [key]: dateString, // Use dateString directly
+                    }));
+                  } else {
+                    setChangedValues((prevValues) => ({
+                      ...prevValues,
+                      [key]: null,
+                    }));
+                  }
+                }}
+              />
+            </Space>
+          </>
+        );
+      }
+      // } else if (
+      //   key === "religion" ||
+      //   key === "relativeName" ||
+      //   key === "gender" ||
+      //   key === "educationQualification"
+      // ) {
+      //   // Define options for each select field
+      //   const options = {
+      //     religion: ["Religion1", "Religion2", "Religion3"], // Replace with actual options
+      //     relativeName: ["Relative1", "Relative2", "Relative3"], // Replace with actual options
+      //     gender: ["Male", "Female", "Other"],
+      //     educationQualification: ["Primary", "Secondary", "Higher", "College"],
+      //   };
+
+      //   return (
+      //     <FormControl fullWidth>
+      //       <InputLabel>{key}</InputLabel>
+      //       <Select
+      //         value={currentValue}
+      //         label={key}
+      //         onChange={(e) => {
+      //           setChangedValues((prevValues) => ({
+      //             ...prevValues,
+      //             [key]: e.target.value,
+      //           }));
+      //         }}
+      //       >
+      //         {options[key].map((option, index) => (
+      //           <MenuItem key={index} value={option}>
+      //             {option}
+      //           </MenuItem>
+      //         ))}
+      //       </Select>
+      //     </FormControl>
+      //   );
+      // }
+      else {
+        return (
+          <TextField
+            key={key}
+            label={key}
+            value={currentValue}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setChangedValues((prevValues) => ({
+                ...prevValues,
+                [key]: e.target.value,
+              }));
+            }}
+          />
+        );
+      }
+    } else {
+      return <Typography key={key}>{`${key}: ${initialValue}`}</Typography>;
+    }
   };
-  
 
   return (
     <>
@@ -226,7 +297,11 @@ export default function EditMembers({ memberObject }) {
               )}
               {isEditMode && (
                 <>
-                  <Button onClick={handleSaveChanges} startIcon={<Save />} style={{ color: "#28a745" }}>
+                  <Button
+                    onClick={handleSaveChanges}
+                    startIcon={<Save />}
+                    style={{ color: "#28a745" }}
+                  >
                     Save
                   </Button>
                   <Button
@@ -304,7 +379,7 @@ export default function EditMembers({ memberObject }) {
                       }}
                     >
                       {isEditMode ? (
-                        renderMemberFields(key,value?.toString())
+                        renderMemberFields(key, value?.toString())
                       ) : key === "aadhaarNumber" ? (
                         `XXXX-XXXX-${value.toString().slice(-4)}`
                       ) : typeof value === "boolean" ? (
