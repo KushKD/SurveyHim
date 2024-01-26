@@ -25,6 +25,14 @@ import ConfirmDialogEdit from "../ConfirmDialogEdit";
 import { useEffect, useState } from "react";
 import ConfirmDialogFamilyEdit from "../../dialogs/ConfirmDialogFamilyEdit";
 import { DatePicker, Space } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { onDistrict } from "../../../network/actions/district";
+import { onMunicipalityList } from "../../../network/actions/municipality";
+import { onWardList } from "../../../network/actions/wards";
+import { onEconomicCategories } from "../../../network/actions/economicCategories";
+import { onSocialCatList } from "../../../network/actions/socialCategories";
+import { onResidentList } from "../../../network/actions/residentials";
+import { onReligionList } from "../../../network/actions/religion";
 
 export default function EditFamily({ selectedFamily }) {
   const [expanded, setExpanded] = useState(false);
@@ -33,6 +41,41 @@ export default function EditFamily({ selectedFamily }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [memberToEdit, setMemberToEdit] = useState(null);
   const [changedValues, setChangedValues] = useState({});
+
+  const dispatch = useDispatch();
+
+  const [districtList, setDistrictList] = useState([]);
+  const district_reducer = useSelector((state) => state.district_reducer);
+  const [selectedDistrictName, setselectedDistrictName] = useState();
+
+  const [municipalityList, setMunicipalityList] = useState([]);
+  const [municipalId, setMunicipalId] = useState("");
+  const [selectedMunicipalityName, setSelectedMunicipalityName] = useState();
+  const municipality_reducer = useSelector(
+    (state) => state.municipality_reducer
+  );
+
+  const [wardList, setWardList] = useState([]);
+  const [ward, setward] = useState("");
+  const [wardId, setwardId] = useState("");
+  const [selectedWardName, setSelectedWardName] = useState();
+  const ward_reducer = useSelector((state) => state.ward_reducer);
+
+  const [economicStatusList, setEconomicStatusList] = useState([]);
+  const [selectedEconomicStatus, setSelectedEconomicStatus] = useState();
+  const economic_reducer = useSelector((state) => state.economicCategories);
+
+  const [socialCategoryList, setSocialCategoryList] = useState([]);
+  const [selectedSocialCategory, setSelectedSocialCategory] = useState();
+  const social_categories = useSelector((state) => state.social_categories);
+
+  const [rsList, setRsList] = useState([]);
+  const [selectedRs, setSsetSelectedRs] = useState();
+  const residentList = useSelector((state) => state.residentList);
+
+  const [religionList, setReligionList] = useState([]);
+  const [selectedReligion, setSelectedReligion] = useState();
+  const religion = useSelector((state) => state.religion);
 
   useEffect(() => {
     const extractedFamilyData = {
@@ -48,7 +91,173 @@ export default function EditFamily({ selectedFamily }) {
       municipalName: selectedFamily.municipalName,
     };
     setEditableFamilyObject(extractedFamilyData);
+    setselectedDistrictName(extractedFamilyData?.districtName);
+    setSelectedMunicipalityName(extractedFamilyData?.municipalName);
+    setSelectedWardName(extractedFamilyData?.wardName);
+    setSelectedEconomicStatus(extractedFamilyData?.economicStatus);
+    setSelectedSocialCategory(extractedFamilyData?.socialCategory);
+    setSsetSelectedRs(extractedFamilyData?.residentStatus);
+    setSelectedReligion(extractedFamilyData?.religion);
   }, [selectedFamily]);
+
+  /**
+   * District List
+   */
+  useEffect(() => {
+    let districtList = [];
+    if (district_reducer?.data) {
+      const { data, status, message } = district_reducer.data || {};
+      // setdistrictCalled(false);
+
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            districtCode: data[i].districtCode,
+            districtName: data[i].districtName,
+          };
+          // console.log("object", object);
+          districtList.push(object);
+        }
+        setDistrictList(districtList);
+        const newId =
+          districtList.find(
+            (option) => option.districtName === selectedDistrictName
+          )?.districtCode || null;
+        console.log("-=-=newId-=-=", newId);
+        dispatch(onMunicipalityList(newId));
+      }
+    }
+  }, [district_reducer, selectedDistrictName]);
+
+  /**
+   * Getting the Municipality List and Ward List Use Effect
+   */
+  useEffect(() => {
+    let municipal_list = [];
+
+    if (municipality_reducer?.data) {
+      const { data, status, message } = municipality_reducer.data || {};
+
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            municipalName: data[i].municipalName,
+            municipalId: data[i].municipalId,
+          };
+          municipal_list.push(object);
+        }
+        setMunicipalityList(municipal_list);
+        const newId =
+          municipalityList.find(
+            (option) => option.municipalName === selectedMunicipalityName
+          )?.municipalId || null;
+        console.log("-=-=municipalId new-=-=", newId);
+        dispatch(onWardList(newId));
+      }
+    }
+  }, [municipality_reducer, selectedMunicipalityName]);
+
+  /**
+   * Ward
+   */
+  useEffect(() => {
+    let ward_list = [];
+
+    if (ward_reducer?.data) {
+      const { data, status, message } = ward_reducer.data || {};
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            wardName: data[i].wardName, //+ " (" + data[i].wardNo + ")",
+            id: data[i].id,
+          };
+          ward_list.push(object);
+        }
+        setWardList(ward_list);
+      }
+    }
+  }, [ward_reducer]);
+
+  /**
+   * Economic Status
+   */
+  useEffect(() => {
+    let economicStatus_List = [];
+
+    if (economic_reducer?.data) {
+      const { data, status, message } = economic_reducer.data || {};
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            economicStatus: data[i].economicStatus, //+ " (" + data[i].wardNo + ")",
+            id: data[i].id,
+          };
+          economicStatus_List.push(object);
+        }
+        setEconomicStatusList(economicStatus_List);
+      }
+    }
+  }, [economic_reducer]);
+
+  /**
+   * Social Category
+   */
+  useEffect(() => {
+    let socialCategoriesList = [];
+    if (social_categories?.data) {
+      const { data, status, message } = social_categories.data || {};
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            socialCategoryNameEnglish: data[i].socialCategoryNameEnglish,
+            id: data[i].id,
+          };
+          socialCategoriesList.push(object);
+        }
+        setSocialCategoryList(socialCategoriesList);
+      }
+    }
+  }, [social_categories]);
+
+  /**
+   * Residential Stataus
+   */
+  useEffect(() => {
+    let rsList = [];
+    if (residentList?.data) {
+      const { data, status, message } = residentList.data || {};
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            residentStatus: data[i].residentStatus,
+            id: data[i].id,
+          };
+          rsList.push(object);
+        }
+        setRsList(rsList);
+      }
+    }
+  }, [residentList]);
+
+  /**
+   * Religion
+   */
+  useEffect(() => {
+    let religionList = [];
+    if (religion?.data) {
+      const { data, status, message } = religion.data || {};
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            religionName: data[i].religionName,
+            id: data[i].id,
+          };
+          religionList.push(object);
+        }
+        setReligionList(religionList);
+      }
+    }
+  }, [religion]);
 
   const handleViewOrCloseClick = () => {
     setExpanded(!expanded);
@@ -64,6 +273,11 @@ export default function EditFamily({ selectedFamily }) {
     setOpenDialog(false);
     setExpanded(true);
     setIsEditMode(true);
+    dispatch(onDistrict());
+    dispatch(onEconomicCategories());
+    dispatch(onSocialCatList());
+    dispatch(onResidentList());
+    dispatch(onReligionList());
   };
 
   const handleCancelEdit = () => {
@@ -114,117 +328,137 @@ export default function EditFamily({ selectedFamily }) {
           );
 
         case "districtName":
-          //console.log("List", genderList);
+          // console.log("List", districtList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
               <Select
-                value={selectedGenderName}
+                value={selectedDistrictName}
                 label={key}
                 onChange={(e) => {
                   const newName = e.target.value;
-                  setSelectedGenderName(newName);
-
+                  setselectedDistrictName(newName);
                   const newId =
-                    options.gender.find(
-                      (option) => option.genderName === newName
-                    )?.id || null;
+                    options.districtName.find(
+                      (option) => option.districtName === newName
+                    )?.districtCode || null;
+                  //console.log("newId", newId);
+                  dispatch(onMunicipalityList(newId));
                   setChangedValues((prevValues) => ({
                     ...prevValues,
-                    [key]: { id: newId, genderName: newName },
+                    [key]: { districtCode: newId, districtName: newName },
                   }));
                 }}
               >
-                {genderList.map((option) => (
-                  <MenuItem key={option.id} value={option.genderName}>
-                    {option.genderName}
+                {districtList.map((option) => (
+                  <MenuItem
+                    key={option.districtCode}
+                    value={option.districtName}
+                  >
+                    {option.districtName}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           );
 
-        case "aadhaarNumber":
-          return (
-            <TextField
-              key={key}
-              label={key}
-              disabled={true}
-              value={currentValue}
-              onChange={(e) => {
-                // Limit input to 10 characters
-                if (e.target.value.length <= 12) {
-                  setChangedValues((prevValues) => ({
-                    ...prevValues,
-                    [key]: e.target.value,
-                  }));
-                }
-              }}
-            />
-          );
-
-        case "wardName":
-          // console.log("List", relationsList);
+        case "municipalName":
+          // console.log("List", occupationList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
               <Select
-                value={selectedRelationName}
+                value={selectedMunicipalityName}
                 label={key}
                 onChange={(e) => {
                   const newName = e.target.value;
-                  setSelectedRelationName(newName);
+                  setSelectedMunicipalityName(newName);
 
                   const newId =
-                    options.relation.find(
-                      (option) => option.relationNameEnglish === newName
-                    )?.id || null;
+                    options.municipalName.find(
+                      (option) => option.municipalName === newName
+                    )?.municipalId || null;
+                  dispatch(onWardList(newId));
                   setChangedValues((prevValues) => ({
                     ...prevValues,
-                    [key]: { id: newId, relationNameEnglish: newName },
+                    [key]: {
+                      municipalId: newId,
+                      municipalName: newName,
+                    },
                   }));
                 }}
               >
-                {relationsList.map((option) => (
-                  <MenuItem key={option.id} value={option.relationNameEnglish}>
-                    {option.relationNameEnglish}
+                {municipalityList.map((option) => (
+                  <MenuItem
+                    key={option.municipalId}
+                    value={option.municipalName}
+                  >
+                    {option.municipalName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+
+        case "wardName":
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedWardName}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedWardName(newName);
+                  const newId =
+                    options.wardName.find(
+                      (option) => option.wardName === newName
+                    )?.id || null;
+                  //console.log("ward id", newId);
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      id: newId,
+                      wardName: newName,
+                    },
+                  }));
+                }}
+              >
+                {wardList.map((option) => (
+                  <MenuItem key={option.id} value={option.wardName}>
+                    {option.wardName}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           );
         case "economicStatus":
-          //console.log("List", qualificationList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
               <Select
-                value={selectedQualification}
+                value={selectedEconomicStatus}
                 label={key}
                 onChange={(e) => {
                   const newName = e.target.value;
-                  setSelectedQualification(newName);
+                  setSelectedEconomicStatus(newName);
 
                   const newId =
-                    options.educationQualification.find(
-                      (option) =>
-                        option.educationQualificationEnglish === newName
+                    options.economicStatus.find(
+                      (option) => option.economicStatus === newName
                     )?.id || null;
                   setChangedValues((prevValues) => ({
                     ...prevValues,
                     [key]: {
                       id: newId,
-                      educationQualificationEnglish: newName,
+                      economicStatus: newName,
                     },
                   }));
                 }}
               >
-                {qualificationList.map((option) => (
-                  <MenuItem
-                    key={option.id}
-                    value={option.educationQualificationEnglish}
-                  >
-                    {option.educationQualificationEnglish}
+                {economicStatusList.map((option) => (
+                  <MenuItem key={option.id} value={option.economicStatus}>
+                    {option.economicStatus}
                   </MenuItem>
                 ))}
               </Select>
@@ -236,94 +470,65 @@ export default function EditFamily({ selectedFamily }) {
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
               <Select
-                value={selectedOccupation}
+                value={selectedSocialCategory}
                 label={key}
                 onChange={(e) => {
                   const newName = e.target.value;
-                  setSelectedOccupation(newName);
+                  setSelectedSocialCategory(newName);
 
                   const newId =
-                    options.occupation.find(
-                      (option) => option.professionName === newName
+                    options.socialCategory.find(
+                      (option) => option.socialCategoryNameEnglish === newName
                     )?.id || null;
                   setChangedValues((prevValues) => ({
                     ...prevValues,
                     [key]: {
                       id: newId,
-                      professionName: newName,
+                      socialCategoryNameEnglish: newName,
                     },
                   }));
                 }}
               >
-                {occupationList.map((option) => (
-                  <MenuItem key={option.id} value={option.professionName}>
-                    {option.professionName}
+                {socialCategoryList.map((option) => (
+                  <MenuItem
+                    key={option.id}
+                    value={option.socialCategoryNameEnglish}
+                  >
+                    {option.socialCategoryNameEnglish}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           );
-        case "municipalName":
-          // console.log("List", occupationList);
-          return (
-            <FormControl fullWidth>
-              <InputLabel>{key}</InputLabel>
-              <Select
-                value={selectedOccupation}
-                label={key}
-                onChange={(e) => {
-                  const newName = e.target.value;
-                  setSelectedOccupation(newName);
 
-                  const newId =
-                    options.occupation.find(
-                      (option) => option.professionName === newName
-                    )?.id || null;
-                  setChangedValues((prevValues) => ({
-                    ...prevValues,
-                    [key]: {
-                      id: newId,
-                      professionName: newName,
-                    },
-                  }));
-                }}
-              >
-                {occupationList.map((option) => (
-                  <MenuItem key={option.id} value={option.professionName}>
-                    {option.professionName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          );
         case "residentStatus":
           // console.log("List", occupationList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
               <Select
-                value={selectedOccupation}
+                value={selectedRs}
                 label={key}
                 onChange={(e) => {
                   const newName = e.target.value;
-                  setSelectedOccupation(newName);
+                  setSsetSelectedRs(newName);
 
                   const newId =
-                    options.occupation.find(
-                      (option) => option.professionName === newName
+                    options.residentStatus.find(
+                      (option) => option.residentStatus === newName
                     )?.id || null;
                   setChangedValues((prevValues) => ({
                     ...prevValues,
                     [key]: {
                       id: newId,
-                      professionName: newName,
+                      residentStatus: newName,
                     },
                   }));
                 }}
               >
-                {occupationList.map((option) => (
-                  <MenuItem key={option.id} value={option.professionName}>
-                    {option.professionName}
+                {rsList.map((option) => (
+                  <MenuItem key={option.id} value={option.residentStatus}>
+                    {option.residentStatus}
                   </MenuItem>
                 ))}
               </Select>
@@ -335,28 +540,28 @@ export default function EditFamily({ selectedFamily }) {
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
               <Select
-                value={selectedOccupation}
+                value={selectedReligion}
                 label={key}
                 onChange={(e) => {
                   const newName = e.target.value;
-                  setSelectedOccupation(newName);
+                  setSelectedReligion(newName);
 
                   const newId =
-                    options.occupation.find(
-                      (option) => option.professionName === newName
+                    options.religion.find(
+                      (option) => option.religionName === newName
                     )?.id || null;
                   setChangedValues((prevValues) => ({
                     ...prevValues,
                     [key]: {
                       id: newId,
-                      professionName: newName,
+                      religionName: newName,
                     },
                   }));
                 }}
               >
-                {occupationList.map((option) => (
-                  <MenuItem key={option.id} value={option.professionName}>
-                    {option.professionName}
+                {religionList.map((option) => (
+                  <MenuItem key={option.id} value={option.religionName}>
+                    {option.religionName}
                   </MenuItem>
                 ))}
               </Select>
@@ -548,7 +753,15 @@ export default function EditFamily({ selectedFamily }) {
                       }}
                     >
                       {isEditMode
-                        ? renderFamilyFields(key, value?.toString())
+                        ? renderFamilyFields(key, value?.toString(), {
+                            districtName: districtList,
+                            municipalName: municipalityList,
+                            wardName: wardList,
+                            economicStatus: economicStatusList,
+                            socialCategory: socialCategoryList,
+                            residentStatus: rsList,
+                            religion: religionList,
+                          })
                         : value?.toString()}
                     </Box>
                   </Box>
