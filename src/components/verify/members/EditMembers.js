@@ -195,7 +195,6 @@ export default function EditMembers({ memberObject }) {
   };
 
   const handleEditClick = () => {
-    //setMemberToEdit(editableMemberObject);
     setOpenDialog(true);
   };
   const handleConfirmEdit = (editableMemberObject) => {
@@ -211,16 +210,19 @@ export default function EditMembers({ memberObject }) {
 
   const handleCancelEdit = () => {
     setOpenDialog(false);
-    setEditableMemberObject(memberObject);
   };
 
   const handleCloseClick = () => {
     setIsEditMode(false);
     setExpanded(false); // Optionally, collapse the accordion here
+
+    //Clear List Dropdown
     setGenderList([]);
     setRelationsList([]);
     setQualificationList([]);
     setOccupationList([]);
+
+    //Clear Changed Values
     setChangedValues({});
   };
 

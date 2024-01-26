@@ -13,49 +13,54 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
   Typography,
 } from "@mui/material";
 import { Box, Chip } from "@mui/material";
-import { TextField } from "formik-material-ui";
 import ConfirmDialogEdit from "../ConfirmDialogEdit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ConfirmDialogFamilyEdit from "../../dialogs/ConfirmDialogFamilyEdit";
+import { DatePicker, Space } from "antd";
 
 export default function EditFamily({ selectedFamily }) {
-  // console.log("selectedFamily", selectedFamily);
-
-  const extractedFamilyData = {
-    districtName: selectedFamily.districtName,
-    wardName: selectedFamily.wardName,
-    houseAddress: selectedFamily.houseAddress,
-    rationCardNo: selectedFamily.rationCardNo,
-    economicStatus: selectedFamily.economicStatus,
-    socialCategory: selectedFamily.socialCategory,
-    religion: selectedFamily.religion,
-    residentStatus: selectedFamily.residentStatus,
-    headOfFamily: selectedFamily.headOfFamily,
-    municipalName: selectedFamily.municipalName,
-  };
-
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editableFamilyObject, setEditableFamilyObject] = useState({
-    extractedFamilyData,
-  });
-
+  const [editableFamilyObject, setEditableFamilyObject] = useState({});
   const [openDialog, setOpenDialog] = useState(false);
   const [memberToEdit, setMemberToEdit] = useState(null);
+  const [changedValues, setChangedValues] = useState({});
+
+  useEffect(() => {
+    const extractedFamilyData = {
+      districtName: selectedFamily.districtName,
+      wardName: selectedFamily.wardName,
+      houseAddress: selectedFamily.houseAddress,
+      rationCardNo: selectedFamily.rationCardNo,
+      economicStatus: selectedFamily.economicStatus,
+      socialCategory: selectedFamily.socialCategory,
+      religion: selectedFamily.religion,
+      residentStatus: selectedFamily.residentStatus,
+      headOfFamily: selectedFamily.headOfFamily,
+      municipalName: selectedFamily.municipalName,
+    };
+    setEditableFamilyObject(extractedFamilyData);
+  }, [selectedFamily]);
 
   const handleViewOrCloseClick = () => {
     setExpanded(!expanded);
     setIsEditMode(false);
   };
 
-  //   const handleEditClick = () => {
-  //     setMemberToEdit(memberObject);
-  //     setOpenDialog(true);
-  //   };
+  const handleEditClick = () => {
+    setOpenDialog(true);
+  };
 
-  const handleConfirmEdit = () => {
+  const handleConfirmEdit = (editableFamilyObject) => {
+    console.log("Edit Family", editableFamilyObject);
     setOpenDialog(false);
     setExpanded(true);
     setIsEditMode(true);
@@ -63,7 +68,7 @@ export default function EditFamily({ selectedFamily }) {
 
   const handleCancelEdit = () => {
     setOpenDialog(false);
-    setEditableMemberObject(extractedFamilyData);
+    //setEditableMemberObject(editableFamilyObject);
   };
 
   const handleCloseClick = () => {
@@ -71,28 +76,311 @@ export default function EditFamily({ selectedFamily }) {
     setExpanded(false); // Optionally, collapse the accordion here
   };
 
-  // Function to render member fields
-  //   const renderMemberFields = () => {
-  //     return Object.entries(editableMemberObject).map(([key, value]) => {
-  //       if (isEditMode) {
-  //         return (
-  //           <TextField
-  //             key={key}
-  //             label={key}
-  //             value={value || ""}
-  //             onChange={(e) =>
-  //               setEditableMemberObject({
-  //                 ...editableMemberObject,
-  //                 [key]: e.target.value,
-  //               })
-  //             }
-  //           />
-  //         );
-  //       } else {
-  //         return <Typography key={key}>{`${key}: ${value}`}</Typography>;
-  //       }
-  //     });
-  //   };
+  const renderFamilyFields = (key, value, options = {}) => {
+    // Use the value from changedValues if it exists, otherwise use the value
+    const currentValue =
+      changedValues[key] !== undefined ? changedValues[key] : value;
+
+    if (isEditMode) {
+      switch (key) {
+        case "dateOfBirth":
+          return (
+            <>
+              <Space direction="vertical">
+                <DatePicker
+                  key={key}
+                  label={key}
+                  defaultValue={value ? dayjs(value, "DD-MM-YYYY") : null}
+                  format="DD-MM-YYYY"
+                  disabledDate={(current) => {
+                    return current && current > dayjs().endOf("day");
+                  }}
+                  onChange={(date, dateString) => {
+                    if (date) {
+                      setChangedValues((prevValues) => ({
+                        ...prevValues,
+                        [key]: dateString,
+                      }));
+                    } else {
+                      setChangedValues((prevValues) => ({
+                        ...prevValues,
+                        [key]: null,
+                      }));
+                    }
+                  }}
+                />
+              </Space>
+            </>
+          );
+
+        case "districtName":
+          //console.log("List", genderList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedGenderName}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedGenderName(newName);
+
+                  const newId =
+                    options.gender.find(
+                      (option) => option.genderName === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: { id: newId, genderName: newName },
+                  }));
+                }}
+              >
+                {genderList.map((option) => (
+                  <MenuItem key={option.id} value={option.genderName}>
+                    {option.genderName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+
+        case "aadhaarNumber":
+          return (
+            <TextField
+              key={key}
+              label={key}
+              disabled={true}
+              value={currentValue}
+              onChange={(e) => {
+                // Limit input to 10 characters
+                if (e.target.value.length <= 12) {
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: e.target.value,
+                  }));
+                }
+              }}
+            />
+          );
+
+        case "wardName":
+          // console.log("List", relationsList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedRelationName}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedRelationName(newName);
+
+                  const newId =
+                    options.relation.find(
+                      (option) => option.relationNameEnglish === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: { id: newId, relationNameEnglish: newName },
+                  }));
+                }}
+              >
+                {relationsList.map((option) => (
+                  <MenuItem key={option.id} value={option.relationNameEnglish}>
+                    {option.relationNameEnglish}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        case "economicStatus":
+          //console.log("List", qualificationList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedQualification}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedQualification(newName);
+
+                  const newId =
+                    options.educationQualification.find(
+                      (option) =>
+                        option.educationQualificationEnglish === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      id: newId,
+                      educationQualificationEnglish: newName,
+                    },
+                  }));
+                }}
+              >
+                {qualificationList.map((option) => (
+                  <MenuItem
+                    key={option.id}
+                    value={option.educationQualificationEnglish}
+                  >
+                    {option.educationQualificationEnglish}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        case "socialCategory":
+          // console.log("List", occupationList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedOccupation}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedOccupation(newName);
+
+                  const newId =
+                    options.occupation.find(
+                      (option) => option.professionName === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      id: newId,
+                      professionName: newName,
+                    },
+                  }));
+                }}
+              >
+                {occupationList.map((option) => (
+                  <MenuItem key={option.id} value={option.professionName}>
+                    {option.professionName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        case "municipalName":
+          // console.log("List", occupationList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedOccupation}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedOccupation(newName);
+
+                  const newId =
+                    options.occupation.find(
+                      (option) => option.professionName === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      id: newId,
+                      professionName: newName,
+                    },
+                  }));
+                }}
+              >
+                {occupationList.map((option) => (
+                  <MenuItem key={option.id} value={option.professionName}>
+                    {option.professionName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        case "residentStatus":
+          // console.log("List", occupationList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedOccupation}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedOccupation(newName);
+
+                  const newId =
+                    options.occupation.find(
+                      (option) => option.professionName === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      id: newId,
+                      professionName: newName,
+                    },
+                  }));
+                }}
+              >
+                {occupationList.map((option) => (
+                  <MenuItem key={option.id} value={option.professionName}>
+                    {option.professionName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        case "religion":
+          // console.log("List", occupationList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedOccupation}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedOccupation(newName);
+
+                  const newId =
+                    options.occupation.find(
+                      (option) => option.professionName === newName
+                    )?.id || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      id: newId,
+                      professionName: newName,
+                    },
+                  }));
+                }}
+              >
+                {occupationList.map((option) => (
+                  <MenuItem key={option.id} value={option.professionName}>
+                    {option.professionName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        default:
+          return (
+            <TextField
+              key={key}
+              label={key}
+              value={currentValue}
+              onChange={(e) => {
+                setChangedValues((prevValues) => ({
+                  ...prevValues,
+                  [key]: e.target.value,
+                }));
+              }}
+            />
+          );
+      }
+    } else {
+      return <Typography key={key}>{`${key}: ${value}`}</Typography>;
+    }
+  };
 
   return (
     <>
@@ -117,22 +405,22 @@ export default function EditFamily({ selectedFamily }) {
                 >
                   <Box style={{ textAlign: "center" }}>
                     <Typography variant="subtitle1">
-                      {extractedFamilyData.headOfFamily}
+                      {editableFamilyObject.headOfFamily}
                     </Typography>
                   </Box>
                   <Box style={{ textAlign: "center" }}>
                     <Typography variant="subtitle1">
-                      {extractedFamilyData.rationCardNo}
+                      {editableFamilyObject.rationCardNo}
                     </Typography>
                   </Box>
                   <Box style={{ textAlign: "center" }}>
                     <Typography variant="subtitle1">
-                      {extractedFamilyData.economicStatus}
+                      {editableFamilyObject.economicStatus}
                     </Typography>
                   </Box>
                   <Box style={{ textAlign: "center" }}>
                     <Typography variant="subtitle1">
-                      {extractedFamilyData.socialCategory}
+                      {editableFamilyObject.socialCategory}
                     </Typography>
                   </Box>
                 </Box>
@@ -156,9 +444,9 @@ export default function EditFamily({ selectedFamily }) {
                   <Button
                     style={{ color: "#42a5f5" }}
                     startIcon={<Update />}
-                    // onClick={() => {
-                    //   handleEditClick(selectedFamily);
-                    // }}
+                    onClick={() => {
+                      handleEditClick(editableFamilyObject);
+                    }}
                   >
                     Edit
                   </Button>
@@ -216,7 +504,7 @@ export default function EditFamily({ selectedFamily }) {
                 padding: "10px",
               }}
             >
-              {Object.entries(extractedFamilyData).map(([key, value]) => {
+              {Object.entries(editableFamilyObject).map(([key, value]) => {
                 return (
                   <Box
                     gridColumn="span 1"
@@ -259,21 +547,9 @@ export default function EditFamily({ selectedFamily }) {
                         color: "#555",
                       }}
                     >
-                      {isEditMode ? (
-                        <TextField
-                          fullWidth
-                          size="small"
-                          value={value || ""}
-                          //   onChange={(e) =>
-                          //     setEditableMemberObject({
-                          //       ...editableMemberObject,
-                          //       [key]: e.target.value,
-                          //     })
-                          // }
-                        />
-                      ) : (
-                        value?.toString()
-                      )}
+                      {isEditMode
+                        ? renderFamilyFields(key, value?.toString())
+                        : value?.toString()}
                     </Box>
                   </Box>
                 );
@@ -283,13 +559,13 @@ export default function EditFamily({ selectedFamily }) {
         </Accordion>
       </div>
 
-      {/* <ConfirmDialogEdit
+      <ConfirmDialogFamilyEdit
         open={openDialog}
-        handleConfirm={handleConfirmEdit}
+        handleConfirm={() => handleConfirmEdit(editableFamilyObject)}
         handleCancel={handleCancelEdit}
-        // memberObject={memberObject}
+        editableFamilyObject={editableFamilyObject}
         sx={{ width: "50%", maxWidth: "600px", mx: "auto" }}
-      /> */}
+      />
     </>
   );
 }
