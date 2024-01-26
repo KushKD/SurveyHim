@@ -29,30 +29,8 @@ import {
 } from "@mui/icons-material";
 import ConfirmDialogEdit from "../ConfirmDialogEdit";
 
-const memberFields = [
-  { label: "Name", valueKey: "memberName", span: 4 },
-  { label: "Date of Birth", valueKey: "dateOfBirth", span: 4 },
-  { label: "Gender", valueKey: "gender", span: 4 },
-  // ... add other fields as necessary, with appropriate 'span' values
-  { label: "Ration Card Number", valueKey: "rationCardNumber", span: 4 },
-  { label: "Relative Name", valueKey: "relativeName", span: 4 },
-  { label: "Relation", valueKey: "relation", span: 4 },
-  { label: "Mobile Number", valueKey: "mobileNumber", span: 4 },
-  { label: "Aadhaar Number", valueKey: "aadhaarNumber", span: 4 },
-  { label: "eKYC Verified", valueKey: "isEkycVerified", span: 4 },
-  {
-    label: "Educational Qualification",
-    valueKey: "educationQualification",
-    span: 4,
-  },
-  { label: "Occupation", valueKey: "occupation", span: 4 },
-  { label: "Email", valueKey: "emailAddress", span: 4 },
-  { label: "Bonafide Status", valueKey: "isBonafide", span: 4 },
-  // Include any additional fields here
-];
-
 export default function Properties({ selectedFamily }) {
-  console.log("Edit Page Here I come", selectedFamily);
+  //console.log("Edit Page Here I come", selectedFamily);
 
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);

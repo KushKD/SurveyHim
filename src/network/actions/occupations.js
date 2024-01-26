@@ -18,7 +18,7 @@ export const onOccupationList = () => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`/getOccupations`, {});
-      console.log(response, "dashboard response");
+      //console.log(response, "dashboard response");
       dispatch(fetchOccupationSuccess(response.data));
     } catch (error) {
       dispatch(fetchOccupationFailure(error));

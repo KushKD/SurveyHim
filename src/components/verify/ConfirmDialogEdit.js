@@ -38,7 +38,9 @@ export default function ConfirmDialogEdit({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancel}>No</Button>
-          <Button onClick={() => handleConfirm(memberObject)} autoFocus>Yes</Button>
+          <Button onClick={() => handleConfirm()} autoFocus>
+            Yes
+          </Button>
         </DialogActions>
       </Dialog>
     </Fragment>

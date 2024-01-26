@@ -18,7 +18,7 @@ export const onGenderList = () => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`/getGender`, {});
-      console.log(response, "dashboard response");
+      //console.log(response, "dashboard response");
       dispatch(fetchGenderSuccess(response.data));
     } catch (error) {
       dispatch(fetchGenderFailure(error));

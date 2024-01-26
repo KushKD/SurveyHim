@@ -31,7 +31,7 @@ import {
 import ConfirmDialogEdit from "../ConfirmDialogEdit";
 
 export default function EditProperties({ selectedFamily }) {
-  console.log("Edit Page Here I come EditProperties", selectedFamily);
+  //console.log("Edit Page Here I come EditProperties", selectedFamily);
 
   const extractedPropertyData = {
     propertyId: selectedFamily?.propertyDetail?.propertyId,
@@ -43,7 +43,7 @@ export default function EditProperties({ selectedFamily }) {
       selectedFamily?.propertyDetail?.waterConnectionNumber,
   };
 
-  console.log("extractedPropertyData", extractedPropertyData);
+  //console.log("extractedPropertyData", extractedPropertyData);
 
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);

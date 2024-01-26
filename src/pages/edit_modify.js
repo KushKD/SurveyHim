@@ -33,8 +33,6 @@ const EditModify = ({ himMemberID }) => {
 
   useEffect(() => {
     const { himParivarId, RationCard } = router.query;
-    console.log("HimParivar ID:", himParivarId, "Ration Card:", RationCard);
-    setdetailCalled(true);
     dispatch(onFamiliesDetailApi(himParivarId, RationCard));
   }, [router.query]);
 
@@ -45,7 +43,7 @@ const EditModify = ({ himMemberID }) => {
       setselectedFamily(familiesDetailApi.data);
       console.log("Selected Family", selectedFamily);
     }
-  }, [familiesDetailApi]);
+  }, [familiesDetailApi, selectedFamily]);
 
   return (
     <>

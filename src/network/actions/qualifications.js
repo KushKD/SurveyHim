@@ -18,7 +18,7 @@ export const onQualificationsList = () => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`/getQualifications`, {});
-      console.log(response, "dashboard response");
+      // console.log(response, "dashboard response");
       dispatch(fetchQualificationSuccess(response.data));
     } catch (error) {
       dispatch(fetchQualificationFailure(error));

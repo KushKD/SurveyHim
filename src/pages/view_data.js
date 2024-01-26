@@ -306,11 +306,6 @@ const ViewData = () => {
       RationCard,
     }).toString();
     router.push(`/edit_modify?${queryParam}`);
-    // console.log("HimParivar ID", himParivarId);
-    // // Redirect to another page with props
-    // router.push("/edit_modify?himMemberID=" + himParivarId, {
-    //   himMemberID: { himParivarId },
-    // });
   };
 
   // console.log(familyList, "Asdadadadsafw");

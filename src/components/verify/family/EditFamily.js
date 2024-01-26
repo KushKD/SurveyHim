@@ -21,7 +21,7 @@ import ConfirmDialogEdit from "../ConfirmDialogEdit";
 import { useState } from "react";
 
 export default function EditFamily({ selectedFamily }) {
-  console.log("selectedFamily", selectedFamily);
+  // console.log("selectedFamily", selectedFamily);
 
   const extractedFamilyData = {
     districtName: selectedFamily.districtName,

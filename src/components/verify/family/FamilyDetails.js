@@ -17,7 +17,7 @@ import { Box, Chip } from "@mui/material";
 import { TextField } from "formik-material-ui";
 
 export default function FamilyDetails({ selectedFamily }) {
-  console.log("selectedFamily", selectedFamily);
+  // console.log("selectedFamily", selectedFamily);
 
   const extractedFamilyData = {
     districtName: selectedFamily.districtName,
@@ -32,7 +32,7 @@ export default function FamilyDetails({ selectedFamily }) {
     municipalName: selectedFamily.municipalName,
   };
 
-  console.log("extractedFamilyData", extractedFamilyData);
+  //console.log("extractedFamilyData", extractedFamilyData);
 
   return (
     <>

@@ -18,7 +18,7 @@ export const onRelationList = () => {
   return async (dispatch) => {
     try {
       const response = await axios.get(`/getRelations`, {});
-      console.log(response, "dashboard response");
+      // console.log(response, "dashboard response");
       dispatch(fetchRelationSuccess(response.data));
     } catch (error) {
       dispatch(fetchRelationFailure(error));

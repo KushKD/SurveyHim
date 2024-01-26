@@ -32,7 +32,7 @@ import ConfirmDialogEdit from "../ConfirmDialogEdit";
 import { Avatar } from "antd";
 
 export default function ConsentHeader({ selectedFamily }) {
-  console.log("Edit Page Here I come ConsentHeader", selectedFamily);
+  //console.log("Edit Page Here I come ConsentHeader", selectedFamily);
 
   const extractedConsent = {
     fileData: selectedFamily?.fileData,

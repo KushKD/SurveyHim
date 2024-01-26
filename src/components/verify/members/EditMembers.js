@@ -44,26 +44,39 @@ import { onOccupationList } from "../../../network/actions/occupations";
 export default function EditMembers({ memberObject }) {
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editableMemberObject, setEditableMemberObject] = useState({
-    memberObject,
-  });
+  const [editableMemberObject, setEditableMemberObject] = useState({});
+
+  const [genderList, setGenderList] = useState([]);
+  const gender_reducer = useSelector((state) => state.gender);
+  const [selectedGenderName, setSelectedGenderName] = useState();
+
+  const [relationsList, setRelationsList] = useState([]);
+  const relations_reducer = useSelector((state) => state.relations);
+  const [selectedRelationName, setSelectedRelationName] = useState();
+
+  const [qualificationList, setQualificationList] = useState([]);
+  const qualifications_reducer = useSelector((state) => state.qualifications);
+  const [selectedQualification, setSelectedQualification] = useState();
+
+  const [occupationList, setOccupationList] = useState([]);
+  const occupation_reducer = useSelector((state) => state.occupations);
+  const [selectedOccupation, setSelectedOccupation] = useState();
+
+  useEffect(() => {
+    setEditableMemberObject({ memberObject });
+    setSelectedGenderName(memberObject.gender);
+    setSelectedRelationName(memberObject.relation);
+    setSelectedQualification(memberObject.educationQualification);
+    setSelectedOccupation(memberObject.occupation);
+  }, [memberObject]);
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [memberToEdit, setMemberToEdit] = useState(null);
   const [changedValues, setChangedValues] = useState({});
 
   const dispatch = useDispatch();
-
-  //console.log("Gender", memberObject.gender);
   /**
    * Gender List
    */
-  const [genderList, setGenderList] = useState([]);
-  const gender_reducer = useSelector((state) => state.gender);
-  const [selectedGenderName, setSelectedGenderName] = useState(
-    memberObject.gender
-  ); // Initialize with a default value
-
   useEffect(() => {
     let genderList = [];
     if (gender_reducer?.data) {
@@ -87,12 +100,6 @@ export default function EditMembers({ memberObject }) {
   /**
    * Relations List
    */
-  const [relationsList, setRelationsList] = useState([]);
-  const relations_reducer = useSelector((state) => state.relations);
-  const [selectedRelationName, setSelectedRelationName] = useState(
-    memberObject.relation
-  );
-
   useEffect(() => {
     let relationList = [];
 
@@ -118,12 +125,6 @@ export default function EditMembers({ memberObject }) {
    * onQualificationsList
    * Qualifications
    */
-  const [qualificationList, setQualificationList] = useState([]);
-  const qualifications_reducer = useSelector((state) => state.qualifications);
-  const [selectedQualification, setSelectedQualification] = useState(
-    memberObject.educationQualification
-  );
-
   useEffect(() => {
     let qualificationList = [];
 
@@ -149,12 +150,6 @@ export default function EditMembers({ memberObject }) {
   /**
    * Occupation List
    */
-  const [occupationList, setOccupationList] = useState([]);
-  const occupation_reducer = useSelector((state) => state.occupations);
-  const [selectedOccupation, setSelectedOccupation] = useState(
-    memberObject.occupation
-  );
-
   useEffect(() => {
     let occupationList = [];
 
@@ -200,12 +195,11 @@ export default function EditMembers({ memberObject }) {
   };
 
   const handleEditClick = () => {
-    setMemberToEdit(memberObject);
+    //setMemberToEdit(editableMemberObject);
     setOpenDialog(true);
   };
-
-  const handleConfirmEdit = ({ editableMemberObject }) => {
-    //console.log("Edit Object", editableMemberObject);
+  const handleConfirmEdit = (editableMemberObject) => {
+    console.log("Edit Object", editableMemberObject);
     setOpenDialog(false);
     setExpanded(true);
     setIsEditMode(true);
@@ -223,6 +217,10 @@ export default function EditMembers({ memberObject }) {
   const handleCloseClick = () => {
     setIsEditMode(false);
     setExpanded(false); // Optionally, collapse the accordion here
+    setGenderList([]);
+    setRelationsList([]);
+    setQualificationList([]);
+    setOccupationList([]);
     setChangedValues({});
   };
 
@@ -672,7 +670,9 @@ export default function EditMembers({ memberObject }) {
 
       <ConfirmDialogEdit
         open={openDialog}
-        handleConfirm={() => handleConfirmEdit(editableMemberObject)}
+        handleConfirm={() =>
+          handleConfirmEdit(editableMemberObject.memberObject)
+        }
         handleCancel={handleCancelEdit}
         memberObject={memberObject}
         sx={{ width: "50%", maxWidth: "600px", mx: "auto" }}
