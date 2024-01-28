@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Accordion,
@@ -7,7 +7,11 @@ import {
   Box,
   Button,
   Chip,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -28,43 +32,85 @@ import {
   Update,
   Visibility,
 } from "@mui/icons-material";
-import ConfirmDialogEdit from "../ConfirmDialogEdit";
+import { useDispatch } from "react-redux";
+import ConfirmDialogPropertyEdit from "../../dialogs/ConfirmDialogPropertyEdit";
 
 export default function EditProperties({ selectedFamily }) {
-  //console.log("Edit Page Here I come EditProperties", selectedFamily);
-
-  const extractedPropertyData = {
-    propertyId: selectedFamily?.propertyDetail?.propertyId,
-    propertyDetails: selectedFamily?.propertyDetail?.propertyDetails,
-    rentGivenTo: selectedFamily?.propertyDetail?.rentGivenTo,
-    electricityConsumerNo:
-      selectedFamily?.propertyDetail?.electricityConsumerNo,
-    waterConnectionNumber:
-      selectedFamily?.propertyDetail?.waterConnectionNumber,
-  };
-
-  //console.log("extractedPropertyData", extractedPropertyData);
-
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editableSelectedFamily, setEditableSelectedFamily] = useState({
-    extractedPropertyData,
-  });
-
   const [openDialog, setOpenDialog] = useState(false);
-  const [memberToEdit, setMemberToEdit] = useState(null);
+  const [changedValues, setChangedValues] = useState({});
+  const [extractedPropertData, setExtractedPropertyData] = useState({});
+  const [propertDetailsList, setPropertDetailsList] = useState([]);
+  const [selectedPropertyDetail, setSelectedPropertyDetail] = useState();
+  const [editedValues, setEditedValues] = useState({});
+  const [initialPropertyData, setInitialPropertyData] = useState({});
+
+  const [currentDisplayData, setCurrentDisplayData] = useState({});
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const extractedPropertyData = {
+      propertyId: selectedFamily?.propertyDetail?.propertyId,
+      propertyDetails: selectedFamily?.propertyDetail?.propertyDetails,
+      rentGivenTo: selectedFamily?.propertyDetail?.rentGivenTo,
+      electricityConsumerNo:
+        selectedFamily?.propertyDetail?.electricityConsumerNo,
+      waterConnectionNumber:
+        selectedFamily?.propertyDetail?.waterConnectionNumber,
+    };
+    setExtractedPropertyData(extractedPropertyData);
+    setSelectedPropertyDetail(extractedPropertyData?.propertyDetails);
+    setInitialPropertyData(extractedPropertyData);
+  }, [selectedFamily]);
+
+  useEffect(() => {
+    // Update the current display data when selectedFamily changes
+    setCurrentDisplayData(extractedPropertData);
+  }, [extractedPropertData]);
+
+  useEffect(() => {
+    if (!isEditMode) {
+      // Reset edited values when exiting edit mode
+      setEditedValues({});
+    }
+  }, [isEditMode]);
+
+  /**
+   * Property Details Array
+   */
+  useEffect(() => {
+    let propertDetailsList = [];
+    const addProperty = (propertyTypeId, propertyTypeName) => {
+      propertDetailsList.push({
+        propertyTypeId: propertyTypeId,
+        propertyTypeName: propertyTypeName,
+      });
+    };
+    addProperty(1, "Rented");
+    addProperty(2, "Owned");
+    addProperty(3, "Leased");
+    setPropertDetailsList(propertDetailsList);
+  }, [selectedPropertyDetail]);
 
   const handleViewOrCloseClick = () => {
     setExpanded(!expanded);
     setIsEditMode(false);
+    // If it was in edit mode, reset to initial data on close
+    if (isEditMode) {
+      setExtractedPropertyData(initialPropertyData);
+      setEditedValues({});
+      setCurrentDisplayData(initialPropertyData);
+    }
   };
 
   const handleEditClick = () => {
-    //setMemberToEdit(extractedPropertyData);
     setOpenDialog(true);
   };
 
-  const handleConfirmEdit = () => {
+  const handleConfirmEdit = (extractedPropertData) => {
+    console.log("Edit Property", extractedPropertData);
     setOpenDialog(false);
     setExpanded(true);
     setIsEditMode(true);
@@ -72,35 +118,81 @@ export default function EditProperties({ selectedFamily }) {
 
   const handleCancelEdit = () => {
     setOpenDialog(false);
-    setEditableSelectedFamily(extractedPropertyData);
   };
 
   const handleCloseClick = () => {
-    setIsEditMode(false);
     setExpanded(false); // Optionally, collapse the accordion here
+    setIsEditMode(false);
+    // Reset edited values to initial data on cancel
+    // Reset edited values to initial data on cancel
+    setExtractedPropertyData(initialPropertyData);
+    setChangedValues({});
+    setSelectedPropertyDetail(initialPropertyData?.propertyDetails);
   };
 
   // Function to render member fields
-  const renderMemberFields = () => {
-    return Object.entries(setEditableSelectedFamily).map(([key, value]) => {
-      if (isEditMode) {
-        return (
-          <TextField
-            key={key}
-            label={key}
-            value={value || ""}
-            onChange={(e) =>
-              setEditableMemberObject({
-                ...editableSelectedFamily,
-                [key]: e.target.value,
-              })
-            }
-          />
-        );
-      } else {
-        return <Typography key={key}>{`${key}: ${value}`}</Typography>;
+  const renderPropertyFields = (key, value, options = {}) => {
+    // Use the value from changedValues if it exists, otherwise use the value
+    const currentValue =
+      changedValues[key] !== undefined ? changedValues[key] : value;
+
+    if (isEditMode) {
+      switch (key) {
+        case "propertyDetails":
+          // console.log("List", districtList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedPropertyDetail}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedPropertyDetail(newName);
+                  const newId =
+                    options.propertyDetails.find(
+                      (option) => option.propertyTypeName === newName
+                    )?.propertyTypeId || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: { propertyTypeId: newId, propertyTypeName: newName },
+                  }));
+                }}
+              >
+                {options.propertyDetails.map((option) => (
+                  <MenuItem
+                    key={option.propertyTypeId}
+                    value={option.propertyTypeName}
+                  >
+                    {option.propertyTypeName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+
+        default:
+          return (
+            <TextField
+              key={key}
+              label={key}
+              value={currentValue}
+              onChange={(e) => {
+                setChangedValues((prevValues) => ({
+                  ...prevValues,
+                  [key]: e.target.value,
+                }));
+              }}
+            />
+          );
       }
-    });
+    } else {
+      return (
+        <Typography
+          key={key}
+        >{`${key}: ${currentDisplayData[key]}`}</Typography>
+      );
+    }
   };
 
   return (
@@ -166,7 +258,7 @@ export default function EditProperties({ selectedFamily }) {
                     style={{ color: "#42a5f5" }}
                     startIcon={<Update />}
                     onClick={() => {
-                      handleEditClick(memberObject);
+                      handleEditClick(extractedPropertData);
                     }}
                   >
                     Edit
@@ -225,7 +317,7 @@ export default function EditProperties({ selectedFamily }) {
                 padding: "10px",
               }}
             >
-              {Object.entries(extractedPropertyData).map(([key, value]) => {
+              {Object.entries(currentDisplayData).map(([key, value]) => {
                 //if (key === "himMemberId") return null; // Skip rendering for "himMemberId"
 
                 return (
@@ -270,21 +362,11 @@ export default function EditProperties({ selectedFamily }) {
                         color: "#555",
                       }}
                     >
-                      {isEditMode ? (
-                        <TextField
-                          fullWidth
-                          size="small"
-                          value={value || ""}
-                          onChange={(e) =>
-                            setEditableMemberObject({
-                              ...editableMemberObject,
-                              [key]: e.target.value,
-                            })
-                          }
-                        />
-                      ) : (
-                        value?.toString()
-                      )}
+                      {isEditMode
+                        ? renderPropertyFields(key, value?.toString(), {
+                            propertyDetails: propertDetailsList,
+                          })
+                        : value?.toString()}
                     </Box>
                   </Box>
                 );
@@ -294,13 +376,13 @@ export default function EditProperties({ selectedFamily }) {
         </Accordion>
       </div>
 
-      {/* <ConfirmDialogEdit
+      <ConfirmDialogPropertyEdit
         open={openDialog}
-        handleConfirm={handleConfirmEdit}
+        handleConfirm={() => handleConfirmEdit(extractedPropertData)}
         handleCancel={handleCancelEdit}
-        memberObject={memberObject}
+        extractedPropertData={extractedPropertData}
         sx={{ width: "50%", maxWidth: "600px", mx: "auto" }}
-      /> */}
+      />
     </>
   );
 }

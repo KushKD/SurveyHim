@@ -41,7 +41,7 @@ const EditModify = ({ himMemberID }) => {
     if (familiesDetailApi?.data) {
       const { data, status, propertyDetail, members } = familiesDetailApi.data;
       setselectedFamily(familiesDetailApi.data);
-      console.log("Selected Family", selectedFamily);
+      // console.log("Selected Family", selectedFamily);
     }
   }, [familiesDetailApi, selectedFamily]);
 

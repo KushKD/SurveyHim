@@ -62,18 +62,40 @@ export default function EditMembers({ memberObject }) {
   const occupation_reducer = useSelector((state) => state.occupations);
   const [selectedOccupation, setSelectedOccupation] = useState();
 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [changedValues, setChangedValues] = useState({});
+
+  const dispatch = useDispatch();
+
+  const [editedValues, setEditedValues] = useState({});
+  const [initialPropertyData, setInitialPropertyData] = useState({});
+
+  const [currentDisplayData, setCurrentDisplayData] = useState({});
+
   useEffect(() => {
     setEditableMemberObject({ memberObject });
     setSelectedGenderName(memberObject.gender);
     setSelectedRelationName(memberObject.relation);
     setSelectedQualification(memberObject.educationQualification);
     setSelectedOccupation(memberObject.occupation);
+    setInitialPropertyData(memberObject);
   }, [memberObject]);
 
-  const [openDialog, setOpenDialog] = useState(false);
-  const [changedValues, setChangedValues] = useState({});
+  useEffect(() => {
+    // Update the current display data when selectedFamily changes
+    setCurrentDisplayData(memberObject);
+  }, [memberObject]);
 
-  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!isEditMode) {
+      // Reset edited values when exiting edit mode
+      setEditedValues({});
+    }
+  }, [isEditMode]);
+
+  /**
+
+
   /**
    * Gender List
    */
@@ -186,12 +208,17 @@ export default function EditMembers({ memberObject }) {
 
     const updatedMemberData = { ...memberObject, ...changedValues };
     console.log("Updated Member Data:", updatedMemberData);
-    setChangedValues({});
+    // setChangedValues({});
   };
 
   const handleViewOrCloseClick = () => {
     setExpanded(!expanded);
     setIsEditMode(false);
+    if (isEditMode) {
+      setEditableMemberObject(initialPropertyData);
+      setEditedValues({});
+      setCurrentDisplayData(initialPropertyData);
+    }
   };
 
   const handleEditClick = () => {
@@ -216,14 +243,12 @@ export default function EditMembers({ memberObject }) {
     setIsEditMode(false);
     setExpanded(false); // Optionally, collapse the accordion here
 
-    //Clear List Dropdown
-    setGenderList([]);
-    setRelationsList([]);
-    setQualificationList([]);
-    setOccupationList([]);
-
-    //Clear Changed Values
+    setEditableMemberObject(initialPropertyData);
     setChangedValues({});
+    setSelectedGenderName(initialPropertyData.gender);
+    setSelectedRelationName(initialPropertyData.relation);
+    setSelectedQualification(initialPropertyData.educationQualification);
+    setSelectedOccupation(initialPropertyData.occupation);
   };
 
   const renderMemberFields = (key, value, options = {}) => {
@@ -448,7 +473,11 @@ export default function EditMembers({ memberObject }) {
           );
       }
     } else {
-      return <Typography key={key}>{`${key}: ${value}`}</Typography>;
+      return (
+        <Typography
+          key={key}
+        >{`${key}: ${currentDisplayData[key]}`}</Typography>
+      );
     }
   };
 
@@ -590,7 +619,7 @@ export default function EditMembers({ memberObject }) {
                 padding: "10px",
               }}
             >
-              {Object.entries(memberObject).map(([key, value]) => {
+              {Object.entries(currentDisplayData).map(([key, value]) => {
                 if (key === "himMemberId") return null; // Skip rendering for "himMemberId"
 
                 return (

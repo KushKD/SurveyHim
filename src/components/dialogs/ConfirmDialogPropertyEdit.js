@@ -15,15 +15,14 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function ConfirmDialogEdit({
+export default function ConfirmDialogPropertyEdit({
   open,
   handleConfirm,
   handleCancel,
-  memberObject,
+  extractedPropertData,
 }) {
   const borderColor = "#074465";
   const typographyColor = borderColor;
-  const aadhaarNumberColor = "blue";
   const confirmButtonColor = "green";
   const cancelButtonColor = "red";
 
@@ -43,24 +42,15 @@ export default function ConfirmDialogEdit({
           id="alert-dialog-title"
           style={{ fontSize: "2em", borderBottom: `2px solid ${borderColor}` }}
         >
-          Edit Member
+          Edit Property Details
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to edit the details of{" "}
             <Typography
-              variant="subtitle1"
+              variant="body1"
               style={{ fontSize: "1.2em", color: typographyColor }}
             >
-              <strong>{memberObject.memberName}</strong>
-            </Typography>{" "}
-            with Aadhaar Number{" "}
-            <Typography
-              variant="subtitle1"
-              style={{ fontSize: "1.2em", color: aadhaarNumberColor }}
-            >
-              XXXX-XXXX-
-              <strong>{memberObject.aadhaarNumber.toString().slice(-4)}</strong>
+              Are you sure you want to edit the Property Details:
             </Typography>
           </DialogContentText>
         </DialogContent>
@@ -71,16 +61,16 @@ export default function ConfirmDialogEdit({
             variant="outlined"
             style={{ fontSize: "1.2em", borderColor: cancelButtonColor }}
           >
-            No
+            Cancel
           </Button>
           <Button
-            onClick={() => handleConfirm()}
+            onClick={handleConfirm}
             color="success"
             variant="contained"
             autoFocus
             style={{ fontSize: "1.2em", backgroundColor: confirmButtonColor }}
           >
-            Yes
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>

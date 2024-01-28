@@ -77,6 +77,10 @@ export default function EditFamily({ selectedFamily }) {
   const [selectedReligion, setSelectedReligion] = useState();
   const religion = useSelector((state) => state.religion);
 
+  const [initialPropertyData, setInitialPropertyData] = useState({});
+  const [currentDisplayData, setCurrentDisplayData] = useState({});
+  const [editedValues, setEditedValues] = useState({});
+
   useEffect(() => {
     const extractedFamilyData = {
       districtName: selectedFamily.districtName,
@@ -98,7 +102,20 @@ export default function EditFamily({ selectedFamily }) {
     setSelectedSocialCategory(extractedFamilyData?.socialCategory);
     setSsetSelectedRs(extractedFamilyData?.residentStatus);
     setSelectedReligion(extractedFamilyData?.religion);
+    setInitialPropertyData(extractedFamilyData);
   }, [selectedFamily]);
+
+  useEffect(() => {
+    // Update the current display data when selectedFamily changes
+    setCurrentDisplayData(editableFamilyObject);
+  }, [editableFamilyObject]);
+
+  useEffect(() => {
+    if (!isEditMode) {
+      // Reset edited values when exiting edit mode
+      setEditedValues({});
+    }
+  }, [isEditMode]);
 
   /**
    * District List
@@ -262,6 +279,12 @@ export default function EditFamily({ selectedFamily }) {
   const handleViewOrCloseClick = () => {
     setExpanded(!expanded);
     setIsEditMode(false);
+
+    if (isEditMode) {
+      setExtractedPropertyData(initialPropertyData);
+      setEditedValues({});
+      setCurrentDisplayData(initialPropertyData);
+    }
   };
 
   const handleEditClick = () => {
@@ -288,6 +311,40 @@ export default function EditFamily({ selectedFamily }) {
   const handleCloseClick = () => {
     setIsEditMode(false);
     setExpanded(false); // Optionally, collapse the accordion here
+
+    setEditableFamilyObject(initialPropertyData);
+    setChangedValues({});
+
+    setselectedDistrictName(initialPropertyData?.districtName);
+    setSelectedMunicipalityName(initialPropertyData?.municipalName);
+    setSelectedWardName(initialPropertyData?.wardName);
+    setSelectedEconomicStatus(initialPropertyData?.economicStatus);
+    setSelectedSocialCategory(initialPropertyData?.socialCategory);
+    setSsetSelectedRs(initialPropertyData?.residentStatus);
+    setSelectedReligion(initialPropertyData?.religion);
+  };
+
+  // const resetEditableFamilyObject = () => {
+  //   setEditableFamilyObject(extractedFamilyData);
+  //   setChangedValues({});
+  // };
+
+  /**
+   * Handle Save
+   * Save the Edited Data to Service
+   */
+  const handleSaveChanges = () => {
+    console.log("Saved changes:", changedValues);
+    // Here you can also merge the changes into memberData or send to a server
+
+    if (Object.keys(changedValues).length === 0) {
+      alert("No changes detected");
+      return;
+    }
+
+    const updatedMemberData = { ...editableFamilyObject, ...changedValues };
+    console.log("Updated Member Data:", updatedMemberData);
+    setChangedValues({});
   };
 
   const renderFamilyFields = (key, value, options = {}) => {
@@ -583,7 +640,7 @@ export default function EditFamily({ selectedFamily }) {
           );
       }
     } else {
-      return <Typography key={key}>{`${key}: ${value}`}</Typography>;
+      <Typography key={key}>{`${key}: ${currentDisplayData[key]}`}</Typography>;
     }
   };
 
@@ -677,7 +734,11 @@ export default function EditFamily({ selectedFamily }) {
               )}
               {isEditMode && (
                 <>
-                  <Button startIcon={<Save />} style={{ color: "#28a745" }}>
+                  <Button
+                    onClick={handleSaveChanges}
+                    startIcon={<Save />}
+                    style={{ color: "#28a745" }}
+                  >
                     Save
                   </Button>
                   <Button
@@ -709,7 +770,7 @@ export default function EditFamily({ selectedFamily }) {
                 padding: "10px",
               }}
             >
-              {Object.entries(editableFamilyObject).map(([key, value]) => {
+              {Object.entries(currentDisplayData).map(([key, value]) => {
                 return (
                   <Box
                     gridColumn="span 1"
