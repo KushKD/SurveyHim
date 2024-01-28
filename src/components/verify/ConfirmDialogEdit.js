@@ -23,7 +23,7 @@ export default function ConfirmDialogEdit({
 }) {
   const borderColor = "#074465";
   const typographyColor = borderColor;
-  const aadhaarNumberColor = "blue";
+  const aadhaarNumberColor = "#074465";
   const confirmButtonColor = "green";
   const cancelButtonColor = "red";
 
@@ -41,7 +41,10 @@ export default function ConfirmDialogEdit({
       >
         <DialogTitle
           id="alert-dialog-title"
-          style={{ fontSize: "2em", borderBottom: `2px solid ${borderColor}` }}
+          style={{
+            fontSize: "1.2em",
+            borderBottom: `2px solid ${borderColor}`,
+          }}
         >
           Edit Member
         </DialogTitle>

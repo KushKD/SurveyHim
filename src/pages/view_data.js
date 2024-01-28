@@ -161,8 +161,21 @@ const ViewData = () => {
   const familiesList = useSelector((state) => state.familiesList);
   const familiesDetailApi = useSelector((state) => state.familiesDetailApi);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
   const globalUser = getToken();
   const router = useRouter();
+
+  useEffect(() => {
+    const globalUser = JSON.parse(getToken());
+    const { roles } = globalUser || {};
+    // setIsAdmin(roles && roles.length > 0 && roles[0] === "Admin");
+    setIsAdmin(
+      roles &&
+        roles.length > 0 &&
+        (roles[0] === "Admin" || roles[0] === "Verifying Authority")
+    );
+  }, []);
 
   const handleFilterChange = ({ district, municipal, ward }) => {
     console.log("selectedDistrict value", district);
@@ -383,35 +396,68 @@ const ViewData = () => {
                                         {index > 6 && (
                                           <>
                                             <Stack spacing={2} direction="row">
-                                              <Button
-                                                color="success"
-                                                startIcon={<RemoveRedEyeIcon />}
-                                                onClick={(handleEvent) => {
-                                                  console.log(row, "Row Data");
-                                                  setSelectedItems(row);
-                                                  setdetailCalled(true);
-                                                  dispatch(
-                                                    onFamiliesDetailApi(
+                                              {isAdmin && (
+                                                <Button
+                                                  color="success"
+                                                  startIcon={
+                                                    <RemoveRedEyeIcon />
+                                                  }
+                                                  onClick={(handleEvent) => {
+                                                    console.log(
+                                                      row,
+                                                      "Row Data"
+                                                    );
+                                                    setSelectedItems(row);
+                                                    setdetailCalled(true);
+                                                    dispatch(
+                                                      onFamiliesDetailApi(
+                                                        row.himParivarId,
+                                                        row.rationCardNo
+                                                      )
+                                                    );
+                                                  }}
+                                                >
+                                                  View
+                                                </Button>
+                                              )}
+                                              {isAdmin && (
+                                                <Button
+                                                  color="error"
+                                                  startIcon={<ModeEditIcon />}
+                                                  onClick={() =>
+                                                    handleSendtoedit(
                                                       row.himParivarId,
                                                       row.rationCardNo
                                                     )
-                                                  );
-                                                }}
-                                              >
-                                                View
-                                              </Button>
-                                              <Button
-                                                color="error"
-                                                startIcon={<ModeEditIcon />}
-                                                onClick={() =>
-                                                  handleSendtoedit(
-                                                    row.himParivarId,
-                                                    row.rationCardNo
-                                                  )
-                                                }
-                                              >
-                                                Verify
-                                              </Button>
+                                                  }
+                                                >
+                                                  Verify
+                                                </Button>
+                                              )}
+                                              {!isAdmin && (
+                                                <Button
+                                                  color="success"
+                                                  startIcon={
+                                                    <RemoveRedEyeIcon />
+                                                  }
+                                                  onClick={(handleEvent) => {
+                                                    console.log(
+                                                      row,
+                                                      "Row Data"
+                                                    );
+                                                    setSelectedItems(row);
+                                                    setdetailCalled(true);
+                                                    dispatch(
+                                                      onFamiliesDetailApi(
+                                                        row.himParivarId,
+                                                        row.rationCardNo
+                                                      )
+                                                    );
+                                                  }}
+                                                >
+                                                  View
+                                                </Button>
+                                              )}
                                             </Stack>
                                           </>
                                         )}

@@ -40,7 +40,10 @@ export default function ConfirmDialogPropertyEdit({
       >
         <DialogTitle
           id="alert-dialog-title"
-          style={{ fontSize: "2em", borderBottom: `2px solid ${borderColor}` }}
+          style={{
+            fontSize: "1.2em",
+            borderBottom: `2px solid ${borderColor}`,
+          }}
         >
           Edit Property Details
         </DialogTitle>

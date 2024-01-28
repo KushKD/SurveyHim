@@ -344,7 +344,7 @@ export default function EditFamily({ selectedFamily }) {
 
     const updatedMemberData = { ...editableFamilyObject, ...changedValues };
     console.log("Updated Member Data:", updatedMemberData);
-    setChangedValues({});
+    //setChangedValues({});
   };
 
   const renderFamilyFields = (key, value, options = {}) => {

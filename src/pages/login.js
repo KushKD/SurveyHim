@@ -309,10 +309,10 @@ function SignIn(props) {
                       onChange={(event) => setPassword(event.target.value)}
                       autoComplete="current-password"
                     />
-                    <FormControlLabel
+                    {/* <FormControlLabel
                       control={<Checkbox value="remember" color="primary" />}
                       label="Remember me"
-                    />
+                    /> */}
                     <Button
                       type="submit"
                       fullWidth

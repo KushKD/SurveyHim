@@ -177,17 +177,12 @@ const Dashboard = () => {
   );
 
   const handleFilterChange = ({ district, municipal, ward }) => {
-    console.log(district, "yes Kush");
-    console.log(district.code, "yes Kush 2");
     setSelectedDistrict(district);
-    console.log("selectedDistrict value", district.code);
     setSelectedMunicipality(municipal);
     setSelectedWard(ward);
 
     if (district || municipal || ward) {
       const queryParams = createQueryParams(district, municipal, ward);
-
-      console.log(queryParams, "Logged Data");
       dispatch(onDashboarFilters(queryParams));
     }
   };

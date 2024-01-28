@@ -40,7 +40,10 @@ export default function ConfirmDialogFamilyEdit({
       >
         <DialogTitle
           id="alert-dialog-title"
-          style={{ fontSize: "2em", borderBottom: `2px solid ${borderColor}` }}
+          style={{
+            fontSize: "1.2em",
+            borderBottom: `2px solid ${borderColor}`,
+          }}
         >
           Edit Family
         </DialogTitle>
@@ -67,7 +70,7 @@ export default function ConfirmDialogFamilyEdit({
               variant="body1"
               style={{ fontSize: "1.2em", color: typographyColor }}
             >
-              with the Head of Family being:{" "}
+              with the Head of Family as:{" "}
               <strong>{editableFamilyObject?.headOfFamily}</strong>
             </Typography>
           </DialogContentText>
