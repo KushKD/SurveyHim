@@ -248,7 +248,7 @@ export default function EditProperties({ selectedFamily }) {
               {!expanded && !isEditMode && (
                 <>
                   <Button
-                    color="error"
+                    style={{ color: "#344147" }}
                     startIcon={<More />}
                     onClick={handleViewOrCloseClick}
                   >

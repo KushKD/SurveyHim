@@ -697,7 +697,7 @@ export default function EditFamily({ selectedFamily }) {
               {!expanded && !isEditMode && (
                 <>
                   <Button
-                    color="error"
+                    style={{ color: "#344147" }}
                     startIcon={<More />}
                     onClick={handleViewOrCloseClick}
                   >

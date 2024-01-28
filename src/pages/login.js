@@ -1,33 +1,23 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import Image from "next/image";
 
 import Paper from "@mui/material/Paper";
-import axios from "../network/api";
-import Logo from "../assets/BackgroundLogin";
 
 import AppLogo from "../assets/svg/himachal_logoo.svg";
 
 import { useRouter } from "next/router";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-
-import Swal from "sweetalert2";
 
 // import { useDispatch, useSelector } from 'react-redux';
 import { onLogin } from "../network/actions/login";
@@ -36,9 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveToken, getUserName, getUlb } from "../utils/cookie";
 // import handler from './api/hello';
 
-import login from "../pages/api/signIn";
 import withAuth from "../utils/withAuth";
-import Head from "next/head";
 import Script from "next/script";
 
 const img = require("../../public/himachal_bg.jpeg");

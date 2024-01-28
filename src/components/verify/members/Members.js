@@ -156,7 +156,8 @@ export default function Members({ memberObject }) {
               {!expanded && !isEditMode && (
                 <>
                   <Button
-                    color="error"
+                    // color="error"
+                    style={{ color: "#344147" }}
                     startIcon={<More />}
                     onClick={handleViewOrCloseClick}
                   >

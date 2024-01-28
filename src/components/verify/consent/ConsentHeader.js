@@ -88,7 +88,7 @@ export default function ConsentHeader({ selectedFamily }) {
                 >
                   <Box style={{ textAlign: "center" }}>
                     <Typography variant="subtitle1">
-                      Declaration (Consent)
+                      Consent Details (Declaration Signed by the Family Member)
                     </Typography>
                   </Box>
                 </Box>
@@ -103,7 +103,8 @@ export default function ConsentHeader({ selectedFamily }) {
               {!expanded && (
                 <>
                   <Button
-                    color="error"
+                    // color="error"
+                    style={{ color: "#344147" }}
                     startIcon={<More />}
                     onClick={handleViewOrCloseClick}
                   >
