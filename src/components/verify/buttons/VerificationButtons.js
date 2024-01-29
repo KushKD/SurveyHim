@@ -2,23 +2,18 @@ import React, { useState } from "react";
 import { Button, Grid, Menu, MenuItem, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Select, FormControl, InputLabel, ButtonGroup } from "@mui/material";
 import { BackHand, Error, RampRight, Verified } from "@mui/icons-material";
 
-
 const reasonsList = [
-    { id: 0, reason: "--Select--" },
-    { id: 1, reason: "Family Already Registered in rural Area" },
-    { id: 2, reason: "Duplicate Entry" },
-    { id: 3, reason: "Survey Not Correct/Incomplete Data" },
-    { id: 4, reason: "Family is of Outside Himachal" },
-  ];
-
+  { id: 0, reason: "--Select--" },
+  { id: 2, reason: "eKYC of Members not complete" },
+  { id: 3, reason: "Survey Not Correct/Incomplete Data" },
+  { id: 4, reason: "Family is of Outside Himachal" },
+];
 
 const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedReason, setSelectedReason] = useState(reasonsList[0]); // Set to the default option object
-
-
-
+  const [selectedReason, setSelectedReason] = useState(reasonsList[0]);
+  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -42,27 +37,42 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
       onFamilyNotVerified(selectedReason);
       handleDialogClose();
     } else {
-      // Handle the case where no reason is selected
       alert("Please select a reason before proceeding.");
     }
   };
 
+  const handleVerifyConfirmation = () => {
+    setConfirmationDialogOpen(true);
+    handleClose();
+  };
+
+  const handleVerifyConfirmationClose = () => {
+    setConfirmationDialogOpen(false);
+  };
+
+  const handleVerify = (verify) => {
+    if (verify) {
+      // Call the verification function
+      onVerify();
+    }
+    handleVerifyConfirmationClose();
+  };
+
   return (
     <div>
-      
       <Grid container spacing={2} justifyContent="center">
         <Grid item>
           <Button
-             startIcon={<Verified />}
+            startIcon={<Verified />}
             style={{ backgroundColor: "green", color: "white" }}
-            onClick={onVerify}
+            onClick={handleVerifyConfirmation}
           >
             Verify Family
           </Button>
         </Grid>
         <Grid item>
           <Button
-             startIcon={<Error />}
+            startIcon={<Error />}
             style={{ backgroundColor: "red", color: "white" }}
             onClick={handleFamilyNotVerified}
           >
@@ -82,45 +92,62 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
 
       {/* Dialog for Family not Verified */}
       <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="md" fullWidth>
-  <DialogTitle>
-    <Typography variant="h6" color="primary">
-    Select Reasons form marking the Family as not verified 
-    </Typography>
-  </DialogTitle>
-  <DialogContent>
-    <FormControl fullWidth>
-    <Select
-  value={selectedReason ? selectedReason.reason : ""}
-  onChange={(e) => {
-    const selectedValue = e.target.value;
-    setSelectedReason(
-      selectedValue
-        ? reasonsList.find((item) => item.reason === selectedValue)
-        : null
-    );
-  }}
->
-  {reasonsList.map((reasonItem) => (
-    <MenuItem key={reasonItem.id} value={reasonItem.reason}>
-      {reasonItem.reason}
-    </MenuItem>
-  ))}
-</Select>
-    </FormControl>
-  </DialogContent>
-  <DialogActions style={{ textAlign: 'center' }}>
-  <ButtonGroup style={{ justifyContent: 'center', padding: '16px' }}>
-    <Button variant="contained" onClick={handleProceed} color="success">
-      Proceed
-    </Button>
-    <Button variant="contained" onClick={handleDialogClose} color="error">
-      Cancel
-    </Button>
-  </ButtonGroup>
-</DialogActions>
+        <DialogTitle>
+          <Typography variant="h6" color="primary">
+            Select Reasons for marking the Family as not verified
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth>
+            <Select
+              value={selectedReason ? selectedReason.reason : ""}
+              onChange={(e) => {
+                const selectedValue = e.target.value;
+                setSelectedReason(
+                  selectedValue
+                    ? reasonsList.find((item) => item.reason === selectedValue)
+                    : null
+                );
+              }}
+            >
+              {reasonsList.map((reasonItem) => (
+                <MenuItem key={reasonItem.id} value={reasonItem.reason}>
+                  {reasonItem.reason}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions style={{ textAlign: "center" }}>
+          <ButtonGroup style={{ justifyContent: "center", padding: "16px" }}>
+            <Button variant="contained" onClick={handleProceed} color="success">
+              Proceed
+            </Button>
+            <Button variant="contained" onClick={handleDialogClose} color="error">
+              Cancel
+            </Button>
+          </ButtonGroup>
+        </DialogActions>
+      </Dialog>
 
-</Dialog>
-
+      {/* Dialog for Verify Family Confirmation */}
+      <Dialog open={confirmationDialogOpen} onClose={handleVerifyConfirmationClose} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Typography variant="h6" color="primary">
+          Do you want to verify the family and all members?
+          </Typography>
+        </DialogTitle>
+        <DialogActions style={{ textAlign: "center" }}>
+          <ButtonGroup style={{ justifyContent: "center", padding: "16px" }}>
+            <Button variant="contained" onClick={() => handleVerify(true)} color="success">
+              Yes
+            </Button>
+            <Button variant="contained" onClick={() => handleVerify(false)} color="error">
+              No
+            </Button>
+          </ButtonGroup>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

@@ -49,6 +49,18 @@ const EditModify = ({ himMemberID }) => {
   const handleVerify = () => {
     // Add your logic for Verify Family button click
     console.log("Verify Family clicked");
+    const isAnyMemberNotVerified = selectedFamily?.members.some(
+      (member) => !member.isEkycVerified
+    );
+
+    if (isAnyMemberNotVerified) {
+      // Display alert if any member's eKYC is not verified
+      alert("Verification not done. Aadhaar eKYC is not conducted for all family members ❗");
+    } else {
+      // Proceed with the verification logic if all members have eKYC verified
+      console.log("Verify Family clicked");
+      // Add your logic for Verify Family button click
+    }
   };
 
   const handleFamilyNotVerified = (remarks) => {

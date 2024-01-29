@@ -836,13 +836,7 @@ export default function EditFamily({ selectedFamily }) {
                   >
                     Save
                   </Button>
-                  <Button
-                    // onClick={handleCloseClick}
-                    style={{ color: "#A04040" }}
-                    startIcon={<Delete />}
-                  >
-                    Delete
-                  </Button>
+                  
                   <Button
                     onClick={handleCloseClick}
                     style={{ color: "#A04040" }}
