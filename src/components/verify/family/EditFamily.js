@@ -13,9 +13,14 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  Divider,
   FormControl,
+  Grid,
+  IconButton,
   InputLabel,
   MenuItem,
+  Modal,
+  Paper,
   Select,
   TextField,
   Typography,
@@ -33,13 +38,35 @@ import { onEconomicCategories } from "../../../network/actions/economicCategorie
 import { onSocialCatList } from "../../../network/actions/socialCategories";
 import { onResidentList } from "../../../network/actions/residentials";
 import { onReligionList } from "../../../network/actions/religion";
+import GenericModal from "../../generic/GenericModal";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "75%",
+  bgcolor: "background.paper",
+  border: "2px solid #83a2b2",
+  boxShadow: 30,
+  height: "90vh",
+  overflow: "hidden",
+  overflowY: "auto",
+  p: 4,
+  borderRadius: 2,
+};
 
 export default function EditFamily({ selectedFamily }) {
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    updatedFamilyData: {},
+    changedValues: {},
+    existingFamilyData: {},
+  });
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editableFamilyObject, setEditableFamilyObject] = useState({});
   const [openDialog, setOpenDialog] = useState(false);
-  const [memberToEdit, setMemberToEdit] = useState(null);
   const [changedValues, setChangedValues] = useState({});
 
   const dispatch = useDispatch();
@@ -324,6 +351,31 @@ export default function EditFamily({ selectedFamily }) {
     setSelectedReligion(initialPropertyData?.religion);
   };
 
+  // Generic Modal Buttons
+
+  const handleProceedModal = () => {
+    // Logic to handle the "Proceed" action when the user clicks the button
+    // You can use the data in modalData (updatedMemberData and changedValues) here
+    // For example, send the data to the server, update state, or perform any other action
+    console.log("Proceeding with modal data:", modalData);
+
+    // Close the modal if needed
+    setShowModal(false);
+
+    /**
+     * Call the Service to Update the Data
+     */
+  };
+
+  const handleCancelModal = () => {
+    // Logic to handle the "Cancel" action when the user clicks the button
+    // For example, you might want to reset the changes or perform other actions
+    console.log("Cancelling modal");
+
+    // Close the modal if needed
+    setShowModal(false);
+  };
+
   // const resetEditableFamilyObject = () => {
   //   setEditableFamilyObject(extractedFamilyData);
   //   setChangedValues({});
@@ -342,8 +394,14 @@ export default function EditFamily({ selectedFamily }) {
       return;
     }
 
-    const updatedMemberData = { ...editableFamilyObject, ...changedValues };
-    console.log("Updated Member Data:", updatedMemberData);
+    const updatedFamilyData = { ...editableFamilyObject, ...changedValues };
+    console.log("Updated Member Data:", updatedFamilyData);
+    setShowModal(true);
+    setModalData({
+      updatedFamilyData: updatedFamilyData,
+      changedValues: changedValues,
+      initialPropertyData: initialPropertyData,
+    });
     //setChangedValues({});
   };
 
@@ -354,38 +412,7 @@ export default function EditFamily({ selectedFamily }) {
 
     if (isEditMode) {
       switch (key) {
-        case "dateOfBirth":
-          return (
-            <>
-              <Space direction="vertical">
-                <DatePicker
-                  key={key}
-                  label={key}
-                  defaultValue={value ? dayjs(value, "DD-MM-YYYY") : null}
-                  format="DD-MM-YYYY"
-                  disabledDate={(current) => {
-                    return current && current > dayjs().endOf("day");
-                  }}
-                  onChange={(date, dateString) => {
-                    if (date) {
-                      setChangedValues((prevValues) => ({
-                        ...prevValues,
-                        [key]: dateString,
-                      }));
-                    } else {
-                      setChangedValues((prevValues) => ({
-                        ...prevValues,
-                        [key]: null,
-                      }));
-                    }
-                  }}
-                />
-              </Space>
-            </>
-          );
-
         case "districtName":
-          // console.log("List", districtList);
           return (
             <FormControl fullWidth>
               <InputLabel>{key}</InputLabel>
@@ -832,13 +859,22 @@ export default function EditFamily({ selectedFamily }) {
           </AccordionDetails>
         </Accordion>
       </div>
-
       <ConfirmDialogFamilyEdit
         open={openDialog}
         handleConfirm={() => handleConfirmEdit(editableFamilyObject)}
         handleCancel={handleCancelEdit}
         editableFamilyObject={editableFamilyObject}
         sx={{ width: "50%", maxWidth: "600px", mx: "auto" }}
+      />
+
+      {/* Modla */}
+      <GenericModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        modalData={modalData}
+        onProceed={handleProceedModal}
+        onCancel={handleCancelModal}
+        parentClass="Family"
       />
     </>
   );
