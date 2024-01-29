@@ -40,8 +40,18 @@ import { onGenderList } from "../../../network/actions/genders";
 import { onRelationList } from "../../../network/actions/relations";
 import { onQualificationsList } from "../../../network/actions/qualifications";
 import { onOccupationList } from "../../../network/actions/occupations";
+import GenericModal from "../../generic/GenericModal";
 
 export default function EditMembers({ memberObject }) {
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    updatedData: {},
+    changedValues: {},
+    existingData: {},
+  });
+
+
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editableMemberObject, setEditableMemberObject] = useState({});
@@ -193,23 +203,7 @@ export default function EditMembers({ memberObject }) {
     }
   }, [occupation_reducer]);
 
-  /**
-   * Handle Save
-   * Save the Edited Data to Service
-   */
-  const handleSaveChanges = () => {
-    console.log("Saved changes:", changedValues);
-    // Here you can also merge the changes into memberData or send to a server
-
-    if (Object.keys(changedValues).length === 0) {
-      alert("No changes detected");
-      return;
-    }
-
-    const updatedMemberData = { ...memberObject, ...changedValues };
-    console.log("Updated Member Data:", updatedMemberData);
-    // setChangedValues({});
-  };
+ 
 
   const handleViewOrCloseClick = () => {
     setExpanded(!expanded);
@@ -249,6 +243,54 @@ export default function EditMembers({ memberObject }) {
     setSelectedRelationName(initialPropertyData.relation);
     setSelectedQualification(initialPropertyData.educationQualification);
     setSelectedOccupation(initialPropertyData.occupation);
+  };
+
+   /**
+   * Handle Save
+   * Save the Edited Data to Service
+   */
+   const handleSaveChanges = () => {
+    console.log("Saved changes:", changedValues);
+    // Here you can also merge the changes into memberData or send to a server
+
+    if (Object.keys(changedValues).length === 0) {
+      alert("No changes detected");
+      return;
+    }
+
+    const updatedMemberData = { ...memberObject, ...changedValues };
+    console.log("Updated Member Data:", updatedMemberData);
+ 
+    setShowModal(true);
+    setModalData({
+      updatedData: updatedMemberData,
+      changedValues: changedValues,
+      existingData: initialPropertyData,
+    });
+    //setChangedValues({});
+  };
+
+  const handleProceedModal = () => {
+    // Logic to handle the "Proceed" action when the user clicks the button
+    // You can use the data in modalData (updatedMemberData and changedValues) here
+    // For example, send the data to the server, update state, or perform any other action
+    console.log("Proceeding with modal data:", modalData);
+
+    // Close the modal if needed
+    setShowModal(false);
+
+    /**
+     * Call the Service to Update the Data
+     */
+  };
+
+  const handleCancelModal = () => {
+    // Logic to handle the "Cancel" action when the user clicks the button
+    // For example, you might want to reset the changes or perform other actions
+    console.log("Cancelling modal");
+
+    // Close the modal if needed
+    setShowModal(false);
   };
 
   const renderMemberFields = (key, value, options = {}) => {
@@ -707,6 +749,16 @@ export default function EditMembers({ memberObject }) {
         handleCancel={handleCancelEdit}
         memberObject={memberObject}
         sx={{ width: "50%", maxWidth: "600px", mx: "auto" }}
+      />
+
+      {/* Modla */}
+      <GenericModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        modalData={modalData}
+        onProceed={handleProceedModal}
+        onCancel={handleCancelModal}
+        parentClass="Member"
       />
     </>
   );

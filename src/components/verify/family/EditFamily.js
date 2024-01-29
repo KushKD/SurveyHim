@@ -59,9 +59,9 @@ const style = {
 export default function EditFamily({ selectedFamily }) {
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({
-    updatedFamilyData: {},
+    updatedData: {},
     changedValues: {},
-    existingFamilyData: {},
+    existingData: {},
   });
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -104,6 +104,11 @@ export default function EditFamily({ selectedFamily }) {
   const [selectedReligion, setSelectedReligion] = useState();
   const religion = useSelector((state) => state.religion);
 
+  //headOfFamily
+  const [headOfFamilyList, setHeadOfFamilyList] = useState([]);
+  const [selectedHeadOfFamily, setSelectedHeadOfFamily] = useState();
+ // const religion = useSelector((state) => state.religion);
+
   const [initialPropertyData, setInitialPropertyData] = useState({});
   const [currentDisplayData, setCurrentDisplayData] = useState({});
   const [editedValues, setEditedValues] = useState({});
@@ -120,6 +125,7 @@ export default function EditFamily({ selectedFamily }) {
       residentStatus: selectedFamily.residentStatus,
       headOfFamily: selectedFamily.headOfFamily,
       municipalName: selectedFamily.municipalName,
+      membersDropDownList: selectedFamily.membersDropDownList
     };
     setEditableFamilyObject(extractedFamilyData);
     setselectedDistrictName(extractedFamilyData?.districtName);
@@ -129,6 +135,7 @@ export default function EditFamily({ selectedFamily }) {
     setSelectedSocialCategory(extractedFamilyData?.socialCategory);
     setSsetSelectedRs(extractedFamilyData?.residentStatus);
     setSelectedReligion(extractedFamilyData?.religion);
+    setSelectedHeadOfFamily(extractedFamilyData?.headOfFamily)
     setInitialPropertyData(extractedFamilyData);
   }, [selectedFamily]);
 
@@ -303,6 +310,27 @@ export default function EditFamily({ selectedFamily }) {
     }
   }, [religion]);
 
+  /**
+   * Head of Family
+   */
+   /**
+   * Religion
+   */
+   useEffect(() => {
+    let headOfFamilyList = [];
+    if (editableFamilyObject?.membersDropDownList) {
+        for (let i = 0; i < editableFamilyObject?.membersDropDownList.length; i++) {
+          let object = {
+            himMemberId: editableFamilyObject?.membersDropDownList[i].himMemberId,
+            name: editableFamilyObject?.membersDropDownList[i].name,
+          };
+          headOfFamilyList.push(object);
+        }
+        setHeadOfFamilyList(headOfFamilyList);
+      
+    }
+  }, [editableFamilyObject]);
+
   const handleViewOrCloseClick = () => {
     setExpanded(!expanded);
     setIsEditMode(false);
@@ -349,6 +377,7 @@ export default function EditFamily({ selectedFamily }) {
     setSelectedSocialCategory(initialPropertyData?.socialCategory);
     setSsetSelectedRs(initialPropertyData?.residentStatus);
     setSelectedReligion(initialPropertyData?.religion);
+    setSelectedHeadOfFamily(initialPropertyData?.membersDropDownList);
   };
 
   // Generic Modal Buttons
@@ -389,20 +418,26 @@ export default function EditFamily({ selectedFamily }) {
     console.log("Saved changes:", changedValues);
     // Here you can also merge the changes into memberData or send to a server
 
+    // Remove membersDropDownList key from changedValues
+    
     if (Object.keys(changedValues).length === 0) {
       alert("No changes detected");
       return;
     }
 
     const updatedFamilyData = { ...editableFamilyObject, ...changedValues };
+    delete updatedFamilyData.membersDropDownList;
+    delete initialPropertyData.membersDropDownList;
+
     console.log("Updated Member Data:", updatedFamilyData);
-    setShowModal(true);
+    console.log("initialPropertyData Data:", initialPropertyData);
+     setShowModal(true);
     setModalData({
-      updatedFamilyData: updatedFamilyData,
+      updatedData: updatedFamilyData,
       changedValues: changedValues,
-      initialPropertyData: initialPropertyData,
+      existingData: initialPropertyData,
     });
-    //setChangedValues({});
+  
   };
 
   const renderFamilyFields = (key, value, options = {}) => {
@@ -651,6 +686,39 @@ export default function EditFamily({ selectedFamily }) {
               </Select>
             </FormControl>
           );
+          case "headOfFamily":
+          // console.log("List", occupationList);
+          return (
+            <FormControl fullWidth>
+              <InputLabel>{key}</InputLabel>
+              <Select
+                value={selectedHeadOfFamily}
+                label={key}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setSelectedHeadOfFamily(newName);
+
+                  const newId =
+                    options.headOfFamily.find(
+                      (option) => option.name === newName
+                    )?.himMemberId || null;
+                  setChangedValues((prevValues) => ({
+                    ...prevValues,
+                    [key]: {
+                      himMemberId: newId,
+                      name: newName,
+                    },
+                  }));
+                }}
+              >
+                {headOfFamilyList.map((option) => (
+                  <MenuItem key={option.himMemberId} value={option.name}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
         default:
           return (
             <TextField
@@ -798,6 +866,7 @@ export default function EditFamily({ selectedFamily }) {
               }}
             >
               {Object.entries(currentDisplayData).map(([key, value]) => {
+                if (key === "membersDropDownList") return null; // Skip rendering for "membersDropDownList"
                 return (
                   <Box
                     gridColumn="span 1"
@@ -849,6 +918,7 @@ export default function EditFamily({ selectedFamily }) {
                             socialCategory: socialCategoryList,
                             residentStatus: rsList,
                             religion: religionList,
+                            headOfFamily: headOfFamilyList
                           })
                         : value?.toString()}
                     </Box>

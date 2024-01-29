@@ -47,8 +47,8 @@ const GenericModal = ({
         return (
           <>
             {modalData &&
-              modalData.updatedFamilyData &&
-              modalData.initialPropertyData && (
+              modalData.updatedData &&
+              modalData.existingData && (
                 <>
                   {/* Initial Values */}
                   <div style={{ flex: 1, marginRight: "16px" }}>
@@ -75,7 +75,7 @@ const GenericModal = ({
                         }}
                       />
                     </Typography>
-                    {Object.entries(modalData?.initialPropertyData).map(
+                    {Object.entries(modalData?.existingData).map(
                       ([key, value]) => (
                         <div key={key} style={{ marginBottom: "8px" }}>
                           <Box display="flex" justifyContent="center" gap={10}>
@@ -140,7 +140,7 @@ const GenericModal = ({
                       />
                     </Typography>
 
-                    {Object.entries(modalData?.updatedFamilyData).map(
+                    {Object.entries(modalData?.updatedData).map(
                       ([key, value]) => (
                         <div key={key} style={{ marginBottom: "8px" }}>
                           <Box display="flex" justifyContent="center" gap={10}>
@@ -179,37 +179,281 @@ const GenericModal = ({
               )}
           </>
         );
-      case "classB":
+      //Member
+      case "Member":
         return (
           <>
-            {/* Your specific UI for Class B */}
-            <Typography
-              variant="h6"
-              color="#074465"
-              style={{
-                fontWeight: "bold",
-                marginBottom: "16px",
-                textAlign: "center",
-                position: "relative",
-              }}
-            >
-              Class B Specific Title:
-              <Divider
-                variant="middle"
-                sx={{
-                  position: "absolute",
-                  width: "90%",
-                  bottom: "-8px",
-                  borderStyle: "dashed",
-                  borderWidth: "1px",
-                  borderColor: "#4d4d4d",
-                }}
-              />
-            </Typography>
-            {/* Add Class B specific content here */}
+            {modalData &&
+              modalData.updatedData &&
+              modalData.existingData && (
+                <>
+                  {/* Initial Values */}
+                  <div style={{ flex: 1, marginRight: "16px" }}>
+                    <Typography
+                      variant="h6"
+                      color="#074465"
+                      style={{
+                        fontWeight: "bold",
+                        marginBottom: "16px", // Add margin bottom
+                        textAlign: "center", // Center-align the text
+                        position: "relative",
+                      }}
+                    >
+                      Initial Values:
+                      <Divider
+                        variant="middle"
+                        sx={{
+                          position: "absolute",
+                          width: "90%",
+                          bottom: "-8px", // Adjust the space between text and dashed line
+                          borderStyle: "dashed",
+                          borderWidth: "1px",
+                          borderColor: "#4d4d4d",
+                        }}
+                      />
+                    </Typography>
+                    {Object.entries(modalData?.existingData).map(
+                      ([key, value]) => (
+                        <div key={key} style={{ marginBottom: "8px" }}>
+                          <Box display="flex" justifyContent="center" gap={10}>
+                            <Typography
+                              style={{ flex: 0.4, textAlign: "right" }}
+                              variant="body1"
+                            >
+                              {key
+                                .replace(/([A-Z])/g, " $1")
+                                .trim()
+                                .charAt(0)
+                                .toUpperCase() +
+                                key
+                                  .replace(/([A-Z])/g, " $1")
+                                  .trim()
+                                  .slice(1)}
+                            </Typography>
+                            <Typography
+                              style={{
+                                flex: 0.6,
+                                color: "#074465",
+                                textAlign: "left",
+                              }}
+                              variant="body1"
+                            >
+                              {value}
+                            </Typography>
+                          </Box>
+                        </div>
+                      )
+                    )}
+                  </div>
+                  {/* Dashed Separator */}
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    style={{ margin: "0 16px", borderWidth: "2px" }}
+                  />
+                  {/* Updated Values */}
+                  <div style={{ flex: 1, marginLeft: "16px" }}>
+                    <Typography
+                      variant="h6"
+                      color="#074465"
+                      style={{
+                        fontWeight: "bold",
+                        marginBottom: "16px", // Add margin bottom
+                        textAlign: "center", // Center-align the text
+                        position: "relative",
+                      }}
+                    >
+                      Updated Values:
+                      <Divider
+                        variant="middle"
+                        sx={{
+                          position: "absolute",
+                          width: "90%",
+                          bottom: "-8px", // Adjust the space between text and dashed line
+                          borderStyle: "dashed",
+                          borderWidth: "1px",
+                          borderColor: "#4d4d4d",
+                        }}
+                      />
+                    </Typography>
+
+                    {Object.entries(modalData?.updatedData).map(
+                      ([key, value]) => (
+                        <div key={key} style={{ marginBottom: "8px" }}>
+                          <Box display="flex" justifyContent="center" gap={10}>
+                            <Typography
+                              style={{ flex: 0.4, textAlign: "right" }}
+                              variant="body1"
+                            >
+                              {key
+                                .replace(/([A-Z])/g, " $1")
+                                .trim()
+                                .charAt(0)
+                                .toUpperCase() +
+                                key
+                                  .replace(/([A-Z])/g, " $1")
+                                  .trim()
+                                  .slice(1)}
+                            </Typography>
+                            <Typography
+                              style={{
+                                flex: 0.6,
+                                color: "green",
+                                textAlign: "left",
+                              }}
+                              variant="body1"
+                            >
+                              {typeof value === "object"
+                                ? JSON.stringify(value)
+                                : value}
+                            </Typography>
+                          </Box>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </>
+              )}
           </>
         );
       // Add more cases as needed
+       //Property
+       case "Property":
+        return (
+          <>
+            {modalData &&
+              modalData.updatedData &&
+              modalData.existingData && (
+                <>
+                  {/* Initial Values */}
+                  <div style={{ flex: 1, marginRight: "16px" }}>
+                    <Typography
+                      variant="h6"
+                      color="#074465"
+                      style={{
+                        fontWeight: "bold",
+                        marginBottom: "16px", // Add margin bottom
+                        textAlign: "center", // Center-align the text
+                        position: "relative",
+                      }}
+                    >
+                      Initial Values:
+                      <Divider
+                        variant="middle"
+                        sx={{
+                          position: "absolute",
+                          width: "90%",
+                          bottom: "-8px", // Adjust the space between text and dashed line
+                          borderStyle: "dashed",
+                          borderWidth: "1px",
+                          borderColor: "#4d4d4d",
+                        }}
+                      />
+                    </Typography>
+                    {Object.entries(modalData?.existingData).map(
+                      ([key, value]) => (
+                        <div key={key} style={{ marginBottom: "8px" }}>
+                          <Box display="flex" justifyContent="center" gap={10}>
+                            <Typography
+                              style={{ flex: 0.4, textAlign: "right" }}
+                              variant="body1"
+                            >
+                              {key
+                                .replace(/([A-Z])/g, " $1")
+                                .trim()
+                                .charAt(0)
+                                .toUpperCase() +
+                                key
+                                  .replace(/([A-Z])/g, " $1")
+                                  .trim()
+                                  .slice(1)}
+                            </Typography>
+                            <Typography
+                              style={{
+                                flex: 0.6,
+                                color: "#074465",
+                                textAlign: "left",
+                              }}
+                              variant="body1"
+                            >
+                              {value}
+                            </Typography>
+                          </Box>
+                        </div>
+                      )
+                    )}
+                  </div>
+                  {/* Dashed Separator */}
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    style={{ margin: "0 16px", borderWidth: "2px" }}
+                  />
+                  {/* Updated Values */}
+                  <div style={{ flex: 1, marginLeft: "16px" }}>
+                    <Typography
+                      variant="h6"
+                      color="#074465"
+                      style={{
+                        fontWeight: "bold",
+                        marginBottom: "16px", // Add margin bottom
+                        textAlign: "center", // Center-align the text
+                        position: "relative",
+                      }}
+                    >
+                      Updated Values:
+                      <Divider
+                        variant="middle"
+                        sx={{
+                          position: "absolute",
+                          width: "90%",
+                          bottom: "-8px", // Adjust the space between text and dashed line
+                          borderStyle: "dashed",
+                          borderWidth: "1px",
+                          borderColor: "#4d4d4d",
+                        }}
+                      />
+                    </Typography>
+
+                    {Object.entries(modalData?.updatedData).map(
+                      ([key, value]) => (
+                        <div key={key} style={{ marginBottom: "8px" }}>
+                          <Box display="flex" justifyContent="center" gap={10}>
+                            <Typography
+                              style={{ flex: 0.4, textAlign: "right" }}
+                              variant="body1"
+                            >
+                              {key
+                                .replace(/([A-Z])/g, " $1")
+                                .trim()
+                                .charAt(0)
+                                .toUpperCase() +
+                                key
+                                  .replace(/([A-Z])/g, " $1")
+                                  .trim()
+                                  .slice(1)}
+                            </Typography>
+                            <Typography
+                              style={{
+                                flex: 0.6,
+                                color: "green",
+                                textAlign: "left",
+                              }}
+                              variant="body1"
+                            >
+                              {typeof value === "object"
+                                ? JSON.stringify(value, null, 2)
+                                : value}
+                            </Typography>
+                          </Box>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </>
+              )}
+          </>
+        );
       default:
         return (
           <>

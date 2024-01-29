@@ -34,6 +34,7 @@ import {
 } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import ConfirmDialogPropertyEdit from "../../dialogs/ConfirmDialogPropertyEdit";
+import GenericModal from "../../generic/GenericModal";
 
 export default function EditProperties({ selectedFamily }) {
   const [expanded, setExpanded] = useState(false);
@@ -47,6 +48,14 @@ export default function EditProperties({ selectedFamily }) {
   const [initialPropertyData, setInitialPropertyData] = useState({});
 
   const [currentDisplayData, setCurrentDisplayData] = useState({});
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    updatedData: {},
+    changedValues: {},
+    existingData: {},
+  });
+
 
   const dispatch = useDispatch();
 
@@ -128,6 +137,59 @@ export default function EditProperties({ selectedFamily }) {
     setExtractedPropertyData(initialPropertyData);
     setChangedValues({});
     setSelectedPropertyDetail(initialPropertyData?.propertyDetails);
+  };
+
+
+
+
+   /**
+   * Handle Save
+   * Save the Edited Data to Service
+   */
+   const handleSaveChanges = () => {
+    console.log("Saved changes:", changedValues);
+    // Here you can also merge the changes into memberData or send to a server
+
+    if (Object.keys(changedValues).length === 0) {
+      alert("No changes detected");
+      return;
+    }
+
+    const updatedPropertyDetails = { ...extractedPropertData, ...changedValues };
+    console.log("Updated Property Data:", updatedPropertyDetails);
+ 
+    setShowModal(true);
+    setModalData({
+      updatedData: updatedPropertyDetails,
+      changedValues: changedValues,
+      existingData: initialPropertyData,
+    });
+    //setChangedValues({});
+  };
+
+
+
+  const handleProceedModal = () => {
+    // Logic to handle the "Proceed" action when the user clicks the button
+    // You can use the data in modalData (updatedMemberData and changedValues) here
+    // For example, send the data to the server, update state, or perform any other action
+    console.log("Proceeding with modal data:", modalData);
+
+    // Close the modal if needed
+    setShowModal(false);
+
+    /**
+     * Call the Service to Update the Data
+     */
+  };
+
+  const handleCancelModal = () => {
+    // Logic to handle the "Cancel" action when the user clicks the button
+    // For example, you might want to reset the changes or perform other actions
+    console.log("Cancelling modal");
+
+    // Close the modal if needed
+    setShowModal(false);
   };
 
   // Function to render member fields
@@ -285,7 +347,7 @@ export default function EditProperties({ selectedFamily }) {
               )}
               {isEditMode && (
                 <>
-                  <Button startIcon={<Save />} style={{ color: "#28a745" }}>
+                  <Button  onClick={handleSaveChanges} startIcon={<Save />} style={{ color: "#28a745" }}> 
                     Save
                   </Button>
                   <Button
@@ -382,6 +444,16 @@ export default function EditProperties({ selectedFamily }) {
         handleCancel={handleCancelEdit}
         extractedPropertData={extractedPropertData}
         sx={{ width: "50%", maxWidth: "600px", mx: "auto" }}
+      />
+
+       {/* Modla */}
+       <GenericModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        modalData={modalData}
+        onProceed={handleProceedModal}
+        onCancel={handleCancelModal}
+        parentClass="Property"
       />
     </>
   );
