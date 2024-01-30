@@ -28,6 +28,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HomeIcon from "@mui/icons-material/Home";
 import Loading from "../Loader";
 import { getToken, removeToken, getUserName, getUlb } from "../../utils/cookie";
+import { Verified } from "@mui/icons-material";
 
 const drawerWidth = 260;
 
@@ -106,7 +107,13 @@ function Layout(props) {
       {/* <Toolbar /> */}
       {/* <Divider /> */}
       <List style={{ marginTop: 20 }}>
-        {["Dashboard", "Survey Summary", "View Data"].map((text, index) => (
+        {[
+          "Dashboard",
+          "Survey Summary",
+          "View Edit Data",
+          "Verified Family Data",
+          "Non Verified Family Data",
+        ].map((text, index) => (
           <ListItem
             key={text}
             disablePadding
