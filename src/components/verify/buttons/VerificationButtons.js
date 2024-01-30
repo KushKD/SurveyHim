@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Button, Grid, Menu, MenuItem, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Select, FormControl, InputLabel, ButtonGroup } from "@mui/material";
+import {
+  Button,
+  Grid,
+  Menu,
+  MenuItem,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  FormControl,
+  InputLabel,
+  ButtonGroup,
+} from "@mui/material";
 import { BackHand, Error, RampRight, Verified } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { onRejectionList} from "../../../network/actions/rejectionReasons";
+import { onRejectionList } from "../../../network/actions/rejectionReasons";
 import { useRouter } from "next/router";
-
-
-
-
 
 const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -16,22 +26,17 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
 
   const router = useRouter();
-  
+
   const [rejectionList, setRejectionList] = useState([]);
   const rejections_reducer = useSelector((state) => state.rejections);
   const dispatch = useDispatch();
-
 
   /**
    * Back Button
    */
   const handleBackButtonClick = () => {
-    // Add the logic for handling the "Back" button click here
-    alert("Back Button clicked");
-
     router.back();
   };
-  
 
   /**
    * Rejection List
@@ -52,12 +57,10 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
           rejectionList.push(object);
         }
         setRejectionList(rejectionList);
-        setSelectedReason(rejectionList[0])
+        setSelectedReason(rejectionList[0]);
       }
     }
   }, [rejections_reducer]);
-
-  
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -136,7 +139,12 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
       </Grid>
 
       {/* Dialog for Family not Verified */}
-      <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="md" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           <Typography variant="h6" color="primary">
             Select Reasons for marking the Family as not verified
@@ -168,7 +176,11 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
             <Button variant="contained" onClick={handleProceed} color="success">
               Proceed
             </Button>
-            <Button variant="contained" onClick={handleDialogClose} color="error">
+            <Button
+              variant="contained"
+              onClick={handleDialogClose}
+              color="error"
+            >
               Cancel
             </Button>
           </ButtonGroup>
@@ -176,18 +188,31 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
       </Dialog>
 
       {/* Dialog for Verify Family Confirmation */}
-      <Dialog open={confirmationDialogOpen} onClose={handleVerifyConfirmationClose} maxWidth="md" fullWidth>
+      <Dialog
+        open={confirmationDialogOpen}
+        onClose={handleVerifyConfirmationClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           <Typography variant="h6" color="primary">
-          Do you want to verify the family and all members?
+            Do you want to verify the family and all members?
           </Typography>
         </DialogTitle>
         <DialogActions style={{ textAlign: "center" }}>
           <ButtonGroup style={{ justifyContent: "center", padding: "16px" }}>
-            <Button variant="contained" onClick={() => handleVerify(true)} color="success">
+            <Button
+              variant="contained"
+              onClick={() => handleVerify(true)}
+              color="success"
+            >
               Yes
             </Button>
-            <Button variant="contained" onClick={() => handleVerify(false)} color="error">
+            <Button
+              variant="contained"
+              onClick={() => handleVerify(false)}
+              color="error"
+            >
               No
             </Button>
           </ButtonGroup>

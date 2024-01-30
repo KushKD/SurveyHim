@@ -55,7 +55,7 @@ const rootReducer = combineReducers({
   dashboardFilterRedux,
   surveySummaryRedux,
   rejections,
-  verification
+  verification,
 });
 
 export default rootReducer;

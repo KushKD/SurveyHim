@@ -5,10 +5,16 @@ import { onFamiliesDetailApi } from "../network/actions/familyDetailApi";
 import { Fragment, useEffect, useState } from "react";
 import {
   Box,
+  Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   Grid,
   Paper,
+  Typography,
 } from "@mui/material";
 
 import EditMembers from "../components/verify/members/EditMembers";
@@ -24,31 +30,32 @@ import VerificationButtons from "../components/verify/buttons/VerificationButton
 import VerificationHeader from "../components/verify/buttons/VerificationHeader";
 import { getUserID } from "../utils/cookie";
 import { onVerification } from "../network/actions/verification";
-import Backdrop from '@mui/material/Backdrop';
-
-
+import Backdrop from "@mui/material/Backdrop";
+import { ErrorOutline, Close } from "@mui/icons-material";
+import ShowMessage from "../components/generic/ShowMessage";
 
 const EditModify = ({ himMemberID }) => {
-
   const verificationObject = {
     remarks_id: null,
     verification_status_id: null,
     him_parivar_id: null,
-    user_id:null
+    user_id: null,
   };
 
   const [loading, setLoading] = useState(false); // Loading state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [modalMessage, setModalMessage] = useState({
+    title: "",
+    content: "",
+  });
 
   const router = useRouter();
   const dispatch = useDispatch();
   const [selectedFamily, setselectedFamily] = useState({});
   const familiesDetailApi = useSelector((state) => state.familiesDetailApi);
-
-  const verification_post = useSelector((state) => state.verification_reducer);
-
-  // State variable using the initialData object
+  const verification_post = useSelector((state) => state.verification);
   const [verificationObj, setVerificationObj] = useState(verificationObject);
-
   useEffect(() => {
     const { himParivarId, RationCard } = router.query;
     if (himParivarId && RationCard) {
@@ -56,211 +63,200 @@ const EditModify = ({ himMemberID }) => {
     }
   }, [router.query]);
 
-
-/**
- * Verification Post
- */
+  /**
+   * Verification Post
+   */
 
   useEffect(() => {
-    console.log("verification_post?.data", verification_post?.data);
     const { data, status, message } = verification_post?.data || {};
     if (verification_post?.data) {
-      
-      if (status === "OK" && message === "SUCCESS") {
-        // if (data.jurisdictionReport) {
-        //   const filteredHeaders = data.jurisdictionReport.headers.filter(
-        //     (header) => header !== "Municipality Id" && header !== "Ward Id"
-        //   );
-        //   console.log("filteredHeaders", filteredHeaders);
-        //   const containsDistrict = filteredHeaders.includes("District");
-
-        //   const rowData = Object.entries(data.jurisdictionReport.data).map(
-        //     ([municipalityName, info]) => {
-        //       // Here the if-else block is used correctly
-        //       if (containsDistrict) {
-        //         // Return object with a certain structure if the condition is true
-        //         return {
-        //           municipalityName,
-        //           district: info.district,
-        //           familyCount: info.familyCount,
-        //           memberCount: info.memberCount,
-        //         };
-        //       } else {
-        //         return {
-        //           municipalityName,
-        //           familyCount: info.familyCount,
-        //           memberCount: info.memberCount,
-        //         };
-        //       }
-        //     }
-        //   );
-
-        //   // console.log("rowData Data", rowData);
-        //   setTableData({ filteredHeaders, rowData });
-        // } else {
-        //   console.log("Unable to read Data");
-        // }
+      if (status === "OK" && message === "Success") {
+        if (data) {
+          handleOpenModal("Success", data);
+          setLoading(false);
+        } else {
+          handleOpenModal("Error", "Unable to Read the Data from Server");
+          setLoading(false);
+        }
       } else {
-        console.log("message",message);
+        handleOpenModal("Message", message);
+        setLoading(false);
       }
     } else {
-      console.log("message",message);
+      handleOpenModal("Message", message);
+      setLoading(false);
     }
   }, [verification_post]);
-
 
   useEffect(() => {
     if (familiesDetailApi?.data) {
       const { data, status, propertyDetail, members } = familiesDetailApi.data;
       setselectedFamily(familiesDetailApi.data);
+      setIsModalOpen(false);
     }
   }, [familiesDetailApi]);
 
+  const handleOpenModal = (title, content) => {
+    setModalMessage({ title, content });
+    setIsModalOpen(true);
+  };
 
   /**
    * Verification Buttons
    */
   const handleVerify = () => {
-    // Add your logic for Verify Family button click
-    console.log("Verify Family clicked");
-    setLoading(true);
-
-    setVerificationObj((prevVerificationObj) => ({
-      ...prevVerificationObj,
-      remarks_id: null, // Family Not Verified Reason
-      verification_status_id: 2, // Family Not Verified
-      him_parivar_id: selectedFamily.himParivarId, // himParivarID
-      user_id: getUserID()
-    }));
-
-    
-
-
-    // const isAnyMemberNotVerified = selectedFamily?.members.some(
-    //   (member) => !member.isEkycVerified
-    // );
-
-    // if (isAnyMemberNotVerified) {
-    //   // Display alert if any member's eKYC is not verified
-    //   alert("Verification not done. Aadhaar eKYC is not conducted for all family members ❗");
-    // } else {
-    //   // Proceed with the verification logic if all members have eKYC verified
-    //   console.log("Verify Family clicked");
-    //   // Add your logic for Verify Family button click
-    // }
+    const isAnyMemberNotVerified = selectedFamily?.members.some(
+      (member) => !member.isEkycVerfied
+    );
+    const userId = getUserID();
+    if (isAnyMemberNotVerified) {
+      // Display alert if any member's eKYC is not verified
+      handleOpenModal(
+        "Error",
+        "Verification for the family cannot be completed as Aadhaar eKYC is not conducted for all family members."
+      );
+    } else {
+      try {
+        dispatch(onVerification(null, 2, selectedFamily.himParivarId, userId));
+        setLoading(true);
+      } catch (error) {
+        handleOpenModal(
+          "Error",
+          "Error While accessing the network. Please Check your internet Connection and try again."
+        );
+      }
+    }
   };
 
   const handleFamilyNotVerified = (remarks) => {
-    setLoading(true);
-    setVerificationObj((prevVerificationObj) => ({
-      ...prevVerificationObj,
-      remarks_id: remarks.id, // Family Not Verified Reason
-      verification_status_id: 3, // Family Not Verified
-      him_parivar_id: selectedFamily.himParivarId, // himParivarID
-      user_id: getUserID()
-    }));
-
-    dispatch(onVerification(verificationObj));
-    setLoading(true);
-
-
+    const userId = getUserID();
+    try {
+      dispatch(
+        onVerification(remarks.id, 3, selectedFamily.himParivarId, userId)
+      );
+      setLoading(true);
+    } catch (error) {
+      handleOpenModal(
+        "Error",
+        "Error While accessing the network. Please Check your internet Connection and try again."
+      );
+    }
   };
 
-  useEffect(() => {
-    console.log("setVerificationObj", verificationObj);
-  }, [verificationObj]);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    const isError = modalMessage.title === "Error";
+
+    // Go back to the previous page if there was no error
+    if (!isError) {
+      router.back();
+    }
+  };
 
   return (
-    <Layout>
-      <main className="p-6 space-y-6">
-        <Paper
-          elevation={3}
-          variant="elevation"
-          style={{ marginBottom: 16, backgroundColor: "#FFF" }}
-        >
-          <div className="p-4 flex-grow">
-            <Box>
-              <div style={{}}>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <FamilyDetailsHeader />
+    <>
+      <Layout>
+        <main className="p-6 space-y-6">
+          <Paper
+            elevation={3}
+            variant="elevation"
+            style={{ marginBottom: 16, backgroundColor: "#FFF" }}
+          >
+            <div className="p-4 flex-grow">
+              <Box>
+                <div style={{}}>
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <FamilyDetailsHeader />
+                    </Grid>
                   </Grid>
-                </Grid>
 
-                <Paper elevation={3} variant="elevation">
-                  {selectedFamily && <EditFamily selectedFamily={selectedFamily} />}
-                </Paper>
-                <Divider>&nbsp; &nbsp;</Divider>
+                  <Paper elevation={3} variant="elevation">
+                    {selectedFamily && (
+                      <EditFamily selectedFamily={selectedFamily} />
+                    )}
+                  </Paper>
+                  <Divider>&nbsp; &nbsp;</Divider>
 
-                <Grid container>
-                  <Grid item xs={12}>
-                    <MemberDetailsHeader />
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <MemberDetailsHeader />
+                    </Grid>
                   </Grid>
-                </Grid>
 
-                {selectedFamily?.members &&
-                  selectedFamily?.members.map((memberObject, index) => (
-                    <Paper
-                      elevation={3}
-                      variant="elevation"
-                      style={{ marginBottom: 8 }}
-                      key={index}
-                    >
-                      <EditMembers memberObject={memberObject} />
-                    </Paper>
-                  ))}
-                <Divider>&nbsp; &nbsp;</Divider>
+                  {selectedFamily?.members &&
+                    selectedFamily?.members.map((memberObject, index) => (
+                      <Paper
+                        elevation={3}
+                        variant="elevation"
+                        style={{ marginBottom: 8 }}
+                        key={index}
+                      >
+                        <EditMembers memberObject={memberObject} />
+                      </Paper>
+                    ))}
+                  <Divider>&nbsp; &nbsp;</Divider>
 
-                <Grid container>
-                  <Grid item xs={12}>
-                    <PropertyDetailsHeader />
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <PropertyDetailsHeader />
+                    </Grid>
                   </Grid>
-                </Grid>
 
-                <Paper elevation={3} variant="elevation">
-                  {selectedFamily && <EditProperties selectedFamily={selectedFamily} />}
-                </Paper>
-                <Divider>&nbsp; &nbsp;</Divider>
+                  <Paper elevation={3} variant="elevation">
+                    {selectedFamily && (
+                      <EditProperties selectedFamily={selectedFamily} />
+                    )}
+                  </Paper>
+                  <Divider>&nbsp; &nbsp;</Divider>
 
-                <Grid container>
-                  <Grid item xs={12}>
-                    <ConsentDetailsHeader />
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <ConsentDetailsHeader />
+                    </Grid>
                   </Grid>
-                </Grid>
 
-                <Paper elevation={3} variant="elevation">
-                  {selectedFamily && <ConsentHeader selectedFamily={selectedFamily} />}
-                </Paper>
-                <Divider>&nbsp; &nbsp;</Divider>
+                  <Paper elevation={3} variant="elevation">
+                    {selectedFamily && (
+                      <ConsentHeader selectedFamily={selectedFamily} />
+                    )}
+                  </Paper>
+                  <Divider>&nbsp; &nbsp;</Divider>
 
-                <Paper elevation={3} variant="elevation">
-                <VerificationHeader />
-                 <VerificationButtons
-                    onVerify={handleVerify}
-                    onFamilyNotVerified={handleFamilyNotVerified}
-                  />
-                </Paper>
-                <Divider>&nbsp; &nbsp;</Divider>
+                  <Paper elevation={3} variant="elevation">
+                    <VerificationHeader />
+                    <VerificationButtons
+                      onVerify={handleVerify}
+                      onFamilyNotVerified={handleFamilyNotVerified}
+                    />
+                  </Paper>
+                  <Divider>&nbsp; &nbsp;</Divider>
 
-                <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
-        invisible={false}
-        // onClick={()=>setLoading(false)}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      
+                  <Backdrop
+                    sx={{
+                      color: "#fff",
+                      zIndex: (theme) => theme.zIndex.drawer + 1,
+                    }}
+                    open={loading}
+                    invisible={false}
+                    // onClick={()=>setLoading(false)}
+                  >
+                    <CircularProgress color="inherit" />
+                  </Backdrop>
 
-                <Divider>&nbsp; &nbsp;</Divider>
-
-               
-              </div>
-            </Box>
-          </div>
-        </Paper>
-      </main>
-    </Layout>
+                  <Divider>&nbsp; &nbsp;</Divider>
+                </div>
+              </Box>
+            </div>
+          </Paper>
+        </main>
+      </Layout>
+      <ShowMessage
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        message={modalMessage}
+      />
+    </>
   );
 };
 

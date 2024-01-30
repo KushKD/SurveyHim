@@ -187,7 +187,8 @@ const ViewData = () => {
       100,
       district?.code,
       municipal?.value,
-      ward?.id
+      ward?.id,
+      1
     );
     console.log("params", queryParams);
     dispatch(onFamiliesList(queryParams));
@@ -210,7 +211,8 @@ const ViewData = () => {
         100,
         selectedDistrict?.code,
         selectedMunicipality?.municipalId,
-        selectedWard?.id
+        selectedWard?.id,
+        1
       );
       console.log("queryParams", queryParams);
       dispatch(onFamiliesList(queryParams));
@@ -223,7 +225,8 @@ const ViewData = () => {
         100,
         districtDetail?.districtCode,
         municipalityDetail?.municipalId,
-        ulb?.id
+        ulb?.id,
+        1
       );
       console.log("queryParams", queryParams);
       dispatch(onFamiliesList(queryParams));
@@ -279,7 +282,8 @@ const ViewData = () => {
     pageSize,
     selectedDistrict,
     selectedMunicipality,
-    selectedWard
+    selectedWard,
+    verificationStatusId
   ) => {
     const queryParams = {};
     if (pageNumber) queryParams.page = pageNumber;
@@ -287,6 +291,8 @@ const ViewData = () => {
     if (selectedDistrict) queryParams.districtCode = selectedDistrict;
     if (selectedMunicipality) queryParams.municipalId = selectedMunicipality;
     if (selectedWard) queryParams.wardId = selectedWard;
+    if (verificationStatusId)
+      queryParams.verificationStatusId = verificationStatusId;
 
     console.log(queryParams);
 
@@ -302,7 +308,8 @@ const ViewData = () => {
       100,
       districtDetail?.districtCode,
       municipalityDetail?.municipalId,
-      ulb?.id
+      ulb?.id,
+      1
     );
     dispatch(onFamiliesList(queryParams));
   }, []);
@@ -349,7 +356,7 @@ const ViewData = () => {
                     }}
                   >
                     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-                      <TableContainer sx={{ height: '65vh' }}>
+                      <TableContainer sx={{ height: "65vh" }}>
                         <Table stickyHeader aria-label="sticky table">
                           <TableHead>
                             <TableRow>
