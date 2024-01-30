@@ -21,6 +21,10 @@ export const getUserName = () => {
   return Cookies.get("userName");
 };
 
+export const getUserID = () => {
+  return Cookies.get("userId");
+};
+
 export const getUlb = () => {
   return Cookies.get("ulb");
 };
