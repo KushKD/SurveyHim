@@ -16,7 +16,7 @@ export const TopCard = (props) => {
           gap: 3,
           display: "grid",
           gridTemplateColumns: {
-            md: "repeat(3, 1fr)",
+            md: "repeat(4, 1fr)",
             sm: "repeat(2, 1fr)",
             xs: "repeat(1, 1fr)",
           },

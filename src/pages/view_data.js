@@ -145,7 +145,7 @@ const ViewData = () => {
   const [isCardClicked, setCardClicked] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(100);
   const [totalPage, setTotalPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [errorMessage, seterrorMessage] = React.useState("");
@@ -184,7 +184,7 @@ const ViewData = () => {
     setSelectedWard(ward);
     const queryParams = createQueryParamsDefault(
       0,
-      10,
+      100,
       district?.code,
       municipal?.value,
       ward?.id
@@ -207,7 +207,7 @@ const ViewData = () => {
       console.log("Inside x", selectedDistrict);
       const queryParams = createQueryParamsDefault(
         newPage - 1,
-        10,
+        100,
         selectedDistrict?.code,
         selectedMunicipality?.municipalId,
         selectedWard?.id
@@ -220,7 +220,7 @@ const ViewData = () => {
         globalUser || {};
       const queryParams = createQueryParamsDefault(
         newPage - 1,
-        10,
+        100,
         districtDetail?.districtCode,
         municipalityDetail?.municipalId,
         ulb?.id
@@ -282,8 +282,6 @@ const ViewData = () => {
     selectedWard
   ) => {
     const queryParams = {};
-
-    //    //familyList?page=${pageNo}&size=10&wardId=${wardId}&muncipalId=${municipalId}&districtCode=${districtCode}`,
     if (pageNumber) queryParams.page = pageNumber;
     if (pageSize) queryParams.size = pageSize;
     if (selectedDistrict) queryParams.districtCode = selectedDistrict;
@@ -301,7 +299,7 @@ const ViewData = () => {
 
     const queryParams = createQueryParamsDefault(
       0,
-      10,
+      100,
       districtDetail?.districtCode,
       municipalityDetail?.municipalId,
       ulb?.id
@@ -351,7 +349,7 @@ const ViewData = () => {
                     }}
                   >
                     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-                      <TableContainer sx={{ maxHeight: 450, height: 450 }}>
+                      <TableContainer sx={{ height: '65vh' }}>
                         <Table stickyHeader aria-label="sticky table">
                           <TableHead>
                             <TableRow>

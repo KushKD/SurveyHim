@@ -1,19 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Grid, Menu, MenuItem, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Select, FormControl, InputLabel, ButtonGroup } from "@mui/material";
 import { BackHand, Error, RampRight, Verified } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { onRejectionList} from "../../../network/actions/rejectionReasons";
+import { useRouter } from "next/router";
 
-const reasonsList = [
-  { id: 0, reason: "--Select--" },
-  { id: 2, reason: "eKYC of Members not complete" },
-  { id: 3, reason: "Survey Not Correct/Incomplete Data" },
-  { id: 4, reason: "Family is of Outside Himachal" },
-];
+
+
+
 
 const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedReason, setSelectedReason] = useState(reasonsList[0]);
+  const [selectedReason, setSelectedReason] = useState();
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
+
+  const router = useRouter();
+  
+  const [rejectionList, setRejectionList] = useState([]);
+  const rejections_reducer = useSelector((state) => state.rejections);
+  const dispatch = useDispatch();
+
+
+  /**
+   * Back Button
+   */
+  const handleBackButtonClick = () => {
+    // Add the logic for handling the "Back" button click here
+    alert("Back Button clicked");
+
+    router.back();
+  };
+  
+
+  /**
+   * Rejection List
+   */
+  useEffect(() => {
+    let rejectionList = [];
+    if (rejections_reducer?.data) {
+      const { data, status, message } = rejections_reducer.data || {};
+      // setdistrictCalled(false);
+
+      if (status === "OK" && message === "SUCCESS") {
+        for (let i = 0; i < data.length; i++) {
+          let object = {
+            id: data[i].id,
+            name: data[i].name,
+          };
+          // console.log("object", object);
+          rejectionList.push(object);
+        }
+        setRejectionList(rejectionList);
+        setSelectedReason(rejectionList[0])
+      }
+    }
+  }, [rejections_reducer]);
+
+  
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -24,6 +68,7 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
   };
 
   const handleFamilyNotVerified = () => {
+    dispatch(onRejectionList());
     setDialogOpen(true);
     handleClose();
   };
@@ -83,7 +128,7 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
           <Button
             startIcon={<BackHand />}
             style={{ backgroundColor: "#396984", color: "white" }}
-            onClick={() => alert("Back Button clicked")}
+            onClick={handleBackButtonClick}
           >
             Cancel/Back
           </Button>
@@ -100,19 +145,19 @@ const VerificationButtons = ({ onVerify, onFamilyNotVerified }) => {
         <DialogContent>
           <FormControl fullWidth>
             <Select
-              value={selectedReason ? selectedReason.reason : ""}
+              value={selectedReason ? selectedReason.name : ""}
               onChange={(e) => {
                 const selectedValue = e.target.value;
                 setSelectedReason(
                   selectedValue
-                    ? reasonsList.find((item) => item.reason === selectedValue)
+                    ? rejectionList.find((item) => item.name === selectedValue)
                     : null
                 );
               }}
             >
-              {reasonsList.map((reasonItem) => (
-                <MenuItem key={reasonItem.id} value={reasonItem.reason}>
-                  {reasonItem.reason}
+              {rejectionList.map((reasonItem) => (
+                <MenuItem key={reasonItem.id} value={reasonItem.name}>
+                  {reasonItem.name}
                 </MenuItem>
               ))}
             </Select>

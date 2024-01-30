@@ -206,8 +206,6 @@ const SurveySummary = () => {
 };
 
 const TableData = (tableData) => {
-  console.log("Inside Data", tableData);
-  console.log("tableData.filteredHeaders", tableData.tableData.filteredHeaders);
   return (
     <>
       <Box
@@ -257,8 +255,7 @@ const TableData = (tableData) => {
             <Paper sx={{ width: "100%", overflow: "hidden", marginTop: 3 }}>
               <TableContainer
                 sx={{
-                  maxHeight: 400,
-                  height: 400,
+                  height: '70vh', 
                   border: 1,
                   borderColor: "gray",
                 }}
@@ -316,15 +313,6 @@ const TableData = (tableData) => {
                   </TableBody>
                 </Table>
               </TableContainer>
-              {/* <Pagination
-                style={{
-                  padding: 10,
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-                count={10}
-                color="primary"
-              /> */}
             </Paper>
           </div>
         </Grid>

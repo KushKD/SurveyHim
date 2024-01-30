@@ -169,7 +169,10 @@ const Dashboard = () => {
    * Dashboard Object
    */
   const [surveyInfo, setSurveyInfo] = useState([]);
-  const [verificationInfoList, setVerificationInfoList] = useState([]);
+  const [verificationInfoList, setVerificationInfoList] = useState([]); 
+  const [aadhaarEkycInfoList, setAadhaarEkycInfoList] = useState([]); 
+
+
 
   const dispatch = useDispatch();
   const dashboardFilterState = useSelector(
@@ -270,6 +273,7 @@ const Dashboard = () => {
         // Set the parsed data to state variables
         setSurveyInfo(data.surveyInfoList);
         setVerificationInfoList(data.verificationInfoList);
+        setAadhaarEkycInfoList(data.aadhaarEkycInfoList);
         console.log("setVerificationInfoList", verificationInfoList);
       } else {
         console.log("No data in dashboardFilterState");
@@ -384,6 +388,35 @@ const Dashboard = () => {
               <Grid item xs={12}>
                 <TopCard
                   top_header_data={verificationInfoList.map((item) => ({
+                    label: item.headerName.toUpperCase(),
+                    value: item.headerValueCount ? item.headerValueCount : 0,
+                    color: "red", // You can customize this color based on your requirements
+                  }))}
+                />
+              </Grid>
+            </Grid>
+          </>
+        )}
+
+{aadhaarEkycInfoList.length > 0 && (
+          <>
+            <Box
+              style={{ background: "#074465", color: "#FFF", borderRadius: 6 }}
+            >
+              <Typography
+                fontSize={20}
+                fontStyle={700}
+                textAlign={"left"}
+                style={{ paddingLeft: 10 }}
+              >
+                Aadhaar eKYC Status
+              </Typography>
+            </Box>
+
+            <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <TopCard
+                  top_header_data={aadhaarEkycInfoList.map((item) => ({
                     label: item.headerName.toUpperCase(),
                     value: item.headerValueCount ? item.headerValueCount : 0,
                     color: "red", // You can customize this color based on your requirements

@@ -25,6 +25,7 @@ import updateRoles from "./updateRoles";
 import createRoles from "./rolesCreate";
 import dashboardFilterRedux from "./dashboardFilter";
 import surveySummaryRedux from "./surevySummary";
+import rejections from "./rejections";
 
 const rootReducer = combineReducers({
   login,
@@ -52,6 +53,7 @@ const rootReducer = combineReducers({
   createRoles,
   dashboardFilterRedux,
   surveySummaryRedux,
+  rejections
 });
 
 export default rootReducer;
