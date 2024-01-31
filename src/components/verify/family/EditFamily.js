@@ -56,7 +56,7 @@ const style = {
   borderRadius: 2,
 };
 
-export default function EditFamily({ selectedFamily }) {
+export default function EditFamily({ onsave, selectedFamily }) {
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({
     updatedData: {},
@@ -107,7 +107,7 @@ export default function EditFamily({ selectedFamily }) {
   //headOfFamily
   const [headOfFamilyList, setHeadOfFamilyList] = useState([]);
   const [selectedHeadOfFamily, setSelectedHeadOfFamily] = useState();
- // const religion = useSelector((state) => state.religion);
+  // const religion = useSelector((state) => state.religion);
 
   const [initialPropertyData, setInitialPropertyData] = useState({});
   const [currentDisplayData, setCurrentDisplayData] = useState({});
@@ -125,7 +125,7 @@ export default function EditFamily({ selectedFamily }) {
       residentStatus: selectedFamily.residentStatus,
       headOfFamily: selectedFamily.headOfFamily,
       municipalName: selectedFamily.municipalName,
-      membersDropDownList: selectedFamily.membersDropDownList
+      membersDropDownList: selectedFamily.membersDropDownList,
     };
     setEditableFamilyObject(extractedFamilyData);
     setselectedDistrictName(extractedFamilyData?.districtName);
@@ -135,7 +135,7 @@ export default function EditFamily({ selectedFamily }) {
     setSelectedSocialCategory(extractedFamilyData?.socialCategory);
     setSsetSelectedRs(extractedFamilyData?.residentStatus);
     setSelectedReligion(extractedFamilyData?.religion);
-    setSelectedHeadOfFamily(extractedFamilyData?.headOfFamily)
+    setSelectedHeadOfFamily(extractedFamilyData?.headOfFamily);
     setInitialPropertyData(extractedFamilyData);
   }, [selectedFamily]);
 
@@ -313,21 +313,24 @@ export default function EditFamily({ selectedFamily }) {
   /**
    * Head of Family
    */
-   /**
+  /**
    * Religion
    */
-   useEffect(() => {
+  useEffect(() => {
     let headOfFamilyList = [];
     if (editableFamilyObject?.membersDropDownList) {
-        for (let i = 0; i < editableFamilyObject?.membersDropDownList.length; i++) {
-          let object = {
-            himMemberId: editableFamilyObject?.membersDropDownList[i].himMemberId,
-            name: editableFamilyObject?.membersDropDownList[i].name,
-          };
-          headOfFamilyList.push(object);
-        }
-        setHeadOfFamilyList(headOfFamilyList);
-      
+      for (
+        let i = 0;
+        i < editableFamilyObject?.membersDropDownList.length;
+        i++
+      ) {
+        let object = {
+          himMemberId: editableFamilyObject?.membersDropDownList[i].himMemberId,
+          name: editableFamilyObject?.membersDropDownList[i].name,
+        };
+        headOfFamilyList.push(object);
+      }
+      setHeadOfFamilyList(headOfFamilyList);
     }
   }, [editableFamilyObject]);
 
@@ -387,13 +390,8 @@ export default function EditFamily({ selectedFamily }) {
     // You can use the data in modalData (updatedMemberData and changedValues) here
     // For example, send the data to the server, update state, or perform any other action
     console.log("Proceeding with modal data:", modalData);
-
-    // Close the modal if needed
     setShowModal(false);
-
-    /**
-     * Call the Service to Update the Data
-     */
+    onsave(modalData);
   };
 
   const handleCancelModal = () => {
@@ -415,11 +413,11 @@ export default function EditFamily({ selectedFamily }) {
    * Save the Edited Data to Service
    */
   const handleSaveChanges = () => {
-    console.log("Saved changes:", changedValues);
+    //console.log("Saved changes:", changedValues);
     // Here you can also merge the changes into memberData or send to a server
 
     // Remove membersDropDownList key from changedValues
-    
+
     if (Object.keys(changedValues).length === 0) {
       alert("No changes detected");
       return;
@@ -429,15 +427,14 @@ export default function EditFamily({ selectedFamily }) {
     delete updatedFamilyData.membersDropDownList;
     delete initialPropertyData.membersDropDownList;
 
-    console.log("Updated Member Data:", updatedFamilyData);
-    console.log("initialPropertyData Data:", initialPropertyData);
-     setShowModal(true);
+    //console.log("Updated Member Data:", updatedFamilyData);
+    //console.log("initialPropertyData Data:", initialPropertyData);
+    setShowModal(true);
     setModalData({
       updatedData: updatedFamilyData,
       changedValues: changedValues,
       existingData: initialPropertyData,
     });
-  
   };
 
   const renderFamilyFields = (key, value, options = {}) => {
@@ -454,6 +451,7 @@ export default function EditFamily({ selectedFamily }) {
               <Select
                 value={selectedDistrictName}
                 label={key}
+                disabled={true}
                 onChange={(e) => {
                   const newName = e.target.value;
                   setselectedDistrictName(newName);
@@ -489,6 +487,7 @@ export default function EditFamily({ selectedFamily }) {
               <Select
                 value={selectedMunicipalityName}
                 label={key}
+                disabled={true}
                 onChange={(e) => {
                   const newName = e.target.value;
                   setSelectedMunicipalityName(newName);
@@ -526,6 +525,7 @@ export default function EditFamily({ selectedFamily }) {
               <Select
                 value={selectedWardName}
                 label={key}
+                disabled={true}
                 onChange={(e) => {
                   const newName = e.target.value;
                   setSelectedWardName(newName);
@@ -686,7 +686,7 @@ export default function EditFamily({ selectedFamily }) {
               </Select>
             </FormControl>
           );
-          case "headOfFamily":
+        case "headOfFamily":
           // console.log("List", occupationList);
           return (
             <FormControl fullWidth>
@@ -836,7 +836,7 @@ export default function EditFamily({ selectedFamily }) {
                   >
                     Save
                   </Button>
-                  
+
                   <Button
                     onClick={handleCloseClick}
                     style={{ color: "#A04040" }}
@@ -912,7 +912,7 @@ export default function EditFamily({ selectedFamily }) {
                             socialCategory: socialCategoryList,
                             residentStatus: rsList,
                             religion: religionList,
-                            headOfFamily: headOfFamilyList
+                            headOfFamily: headOfFamilyList,
                           })
                         : value?.toString()}
                     </Box>

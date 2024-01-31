@@ -27,6 +27,7 @@ import dashboardFilterRedux from "./dashboardFilter";
 import surveySummaryRedux from "./surevySummary";
 import rejections from "./rejections";
 import verification from "./verification_reducer";
+import saveFamily from "./saveFamily";
 
 const rootReducer = combineReducers({
   login,
@@ -56,6 +57,7 @@ const rootReducer = combineReducers({
   surveySummaryRedux,
   rejections,
   verification,
+  saveFamily,
 });
 
 export default rootReducer;

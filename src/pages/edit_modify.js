@@ -30,6 +30,7 @@ import VerificationButtons from "../components/verify/buttons/VerificationButton
 import VerificationHeader from "../components/verify/buttons/VerificationHeader";
 import { getUserID } from "../utils/cookie";
 import { onVerification } from "../network/actions/verification";
+import { onFamilyUpdate } from "../network/actions/familyUpdate";
 import Backdrop from "@mui/material/Backdrop";
 import { ErrorOutline, Close } from "@mui/icons-material";
 import ShowMessage from "../components/generic/ShowMessage";
@@ -55,6 +56,8 @@ const EditModify = ({ himMemberID }) => {
   const [selectedFamily, setselectedFamily] = useState({});
   const familiesDetailApi = useSelector((state) => state.familiesDetailApi);
   const verification_post = useSelector((state) => state.verification);
+
+  const familySave = useSelector((state) => state.familySave);
   const [verificationObj, setVerificationObj] = useState(verificationObject);
   useEffect(() => {
     const { himParivarId, RationCard } = router.query;
@@ -64,9 +67,38 @@ const EditModify = ({ himMemberID }) => {
   }, [router.query]);
 
   /**
-   * Verification Post
+   * ===================================================================================================================
+   * Update Family
+   * UseEffect
+   * ===================================================================================================================
    */
+  useEffect(() => {
+    const { data, status, message } = familySave?.data || {};
+    if (familySave?.data) {
+      if (status === "OK" && message === "Success") {
+        if (data) {
+          handleOpenModal("Successfully Updated", data);
+          setLoading(false);
+        } else {
+          handleOpenModal("Error", "Unable to Read the Data from Server");
+          setLoading(false);
+        }
+      } else {
+        handleOpenModal("Message", message);
+        setLoading(false);
+      }
+    } else {
+      handleOpenModal("Message", message);
+      setLoading(false);
+    }
+  }, [familySave]);
 
+  /**
+   * ===================================================================================================================
+   * Verification of Family useEffect Post
+   * Verification of Buttons Start
+   * ===================================================================================================================
+   */
   useEffect(() => {
     const { data, status, message } = verification_post?.data || {};
     if (verification_post?.data) {
@@ -101,9 +133,6 @@ const EditModify = ({ himMemberID }) => {
     setIsModalOpen(true);
   };
 
-  /**
-   * Verification Buttons
-   */
   const handleVerify = () => {
     const isAnyMemberNotVerified = selectedFamily?.members.some(
       (member) => !member.isEkycVerfied
@@ -146,12 +175,62 @@ const EditModify = ({ himMemberID }) => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     const isError = modalMessage.title === "Error";
-
-    // Go back to the previous page if there was no error
     if (!isError) {
-      router.back();
+      if (modalMessage.title === "Successfully Updated") {
+        // Reload the page if modal title is "Successfully Updated"
+        window.location.reload();
+      } else {
+        router.back();
+      }
+    }
+
+    //Successfully Updated
+  };
+
+  /**
+   * ===================================================================================================================
+   * Verification of Family useEffect Post
+   * Verification of Buttons Ends
+   * ===================================================================================================================
+   */
+
+  /**
+   * ===================================================================================================================
+   *  Family Save Update Starts
+   * ===================================================================================================================
+   */
+  const handleFamilySave = (modalData) => {
+    const userId = getUserID();
+
+    if (modalData && modalData.updatedData) {
+      modalData.updatedData.userId = userId;
+      modalData.updatedData.himParivarId = selectedFamily.himParivarId;
+      console.log(
+        "updatedFamilyData Inside Parent Component",
+        modalData.updatedData
+      );
+      try {
+        dispatch(onFamilyUpdate(modalData.updatedData));
+        setLoading(true);
+      } catch (error) {
+        handleOpenModal(
+          "Error",
+          "Error While accessing the network. Please Check your internet Connection and try again."
+        );
+      }
+    } else {
+      handleOpenModal(
+        "Error",
+        "Unable to process the request. Please refresh the page or try agmain later."
+      );
     }
   };
+
+  /**
+   * ===================================================================================================================
+   *  Family Save Update Ends
+   * ===================================================================================================================
+   */
 
   return (
     <>
@@ -173,7 +252,10 @@ const EditModify = ({ himMemberID }) => {
 
                   <Paper elevation={3} variant="elevation">
                     {selectedFamily && (
-                      <EditFamily selectedFamily={selectedFamily} />
+                      <EditFamily
+                        onsave={handleFamilySave}
+                        selectedFamily={selectedFamily}
+                      />
                     )}
                   </Paper>
                   <Divider>&nbsp; &nbsp;</Divider>

@@ -56,7 +56,6 @@ export default function EditProperties({ selectedFamily }) {
     existingData: {},
   });
 
-
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -139,14 +138,11 @@ export default function EditProperties({ selectedFamily }) {
     setSelectedPropertyDetail(initialPropertyData?.propertyDetails);
   };
 
-
-
-
-   /**
+  /**
    * Handle Save
    * Save the Edited Data to Service
    */
-   const handleSaveChanges = () => {
+  const handleSaveChanges = () => {
     console.log("Saved changes:", changedValues);
     // Here you can also merge the changes into memberData or send to a server
 
@@ -155,9 +151,12 @@ export default function EditProperties({ selectedFamily }) {
       return;
     }
 
-    const updatedPropertyDetails = { ...extractedPropertData, ...changedValues };
+    const updatedPropertyDetails = {
+      ...extractedPropertData,
+      ...changedValues,
+    };
     console.log("Updated Property Data:", updatedPropertyDetails);
- 
+
     setShowModal(true);
     setModalData({
       updatedData: updatedPropertyDetails,
@@ -166,8 +165,6 @@ export default function EditProperties({ selectedFamily }) {
     });
     //setChangedValues({});
   };
-
-
 
   const handleProceedModal = () => {
     // Logic to handle the "Proceed" action when the user clicks the button
@@ -347,16 +344,20 @@ export default function EditProperties({ selectedFamily }) {
               )}
               {isEditMode && (
                 <>
-                  <Button  onClick={handleSaveChanges} startIcon={<Save />} style={{ color: "#28a745" }}> 
+                  <Button
+                    onClick={handleSaveChanges}
+                    startIcon={<Save />}
+                    style={{ color: "#28a745" }}
+                  >
                     Save
                   </Button>
-                  <Button
+                  {/* <Button
                     // onClick={handleCloseClick}
                     style={{ color: "#A04040" }}
                     startIcon={<Delete />}
                   >
                     Delete
-                  </Button>
+                  </Button> */}
                   <Button
                     onClick={handleCloseClick}
                     style={{ color: "#A04040" }}
@@ -446,8 +447,8 @@ export default function EditProperties({ selectedFamily }) {
         sx={{ width: "50%", maxWidth: "600px", mx: "auto" }}
       />
 
-       {/* Modla */}
-       <GenericModal
+      {/* Modla */}
+      <GenericModal
         showModal={showModal}
         setShowModal={setShowModal}
         modalData={modalData}

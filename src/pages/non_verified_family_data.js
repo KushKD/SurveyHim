@@ -10,7 +10,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Groups2TwoToneIcon from "@mui/icons-material/Groups2TwoTone";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import { FaceRetouchingOffRounded } from "@mui/icons-material";
+import { BackHand, FaceRetouchingOffRounded } from "@mui/icons-material";
 import ErrorIcon from "@mui/icons-material/Error";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
@@ -456,6 +456,19 @@ const NonVerifiedFamilyData = () => {
                                                 }}
                                               >
                                                 View
+                                              </Button>
+
+                                              <Button
+                                                color="error"
+                                                startIcon={<BackHand />}
+                                                // onClick={() =>
+                                                //   handleSendtoedit(
+                                                //     row.himParivarId,
+                                                //     row.rationCardNo
+                                                //   )
+                                                // }
+                                              >
+                                                Roll Back
                                               </Button>
                                             </Stack>
                                           </>
