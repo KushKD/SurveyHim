@@ -115,11 +115,11 @@ const EditModify = ({ himMemberID }) => {
           setLoading(false);
         }
       } else {
-        handleOpenModal("Error", message);
+        handleOpenModal("Error", "message");
         setLoading(false);
       }
     } else {
-      handleOpenModal("Error", message);
+      handleOpenModal("Error", "Unable to Read the Data from Server");
       setLoading(false);
     }
   }, [memberSave]);

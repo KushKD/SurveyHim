@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { onFamiliesList } from "../network/actions/familiesList";
 import { onFamiliesDetailApi } from "../network/actions/familyDetailApi";
 import { onShowLoader } from "../network/actions/showLoader";
-import { getToken } from "../utils/cookie";
+import { getToken, getUserID } from "../utils/cookie";
 import { useRouter } from "next/router";
 import Snackbar from "@mui/material/Snackbar";
 import Groups2TwoToneIcon from "@mui/icons-material/Groups2TwoTone";
@@ -16,6 +16,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import { onVerification } from "../network/actions/verification";
 import {
   Box,
   Button,
@@ -44,6 +45,8 @@ import FamilyDetailsHeader from "../components/verify/family/FamilyDetailsHeader
 import MemberDetailsHeader from "../components/verify/members/MemberDetailsHeader";
 import EditFamily from "../components/verify/family/EditFamily";
 import Families from "../components/verify/family/Families";
+import ShowMessage from "../components/generic/ShowMessage";
+import ShowMessageRevoke from "../components/generic/ShowMessageRevoke";
 
 const columns = [
   {
@@ -166,6 +169,44 @@ const NonVerifiedFamilyData = () => {
   const globalUser = getToken();
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false); // Loading state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [himParivarId, setHimparivarId] = useState();
+
+  const [modalMessage, setModalMessage] = useState({
+    title: "",
+    content: "",
+  });
+  const verification_post = useSelector((state) => state.verification);
+
+  /**
+   * ===================================================================================================================
+   * Verification of Family useEffect Post
+   * Verification of Buttons Start
+   * ===================================================================================================================
+   */
+  useEffect(() => {
+    const { data, status, message } = verification_post?.data || {};
+    if (verification_post?.data) {
+      if (status === "OK" && message === "Success") {
+        if (data) {
+          handleOpenModal("Success", data);
+          setLoading(false);
+        } else {
+          handleOpenModal("Error", "Unable to Read the Data from Server");
+          setLoading(false);
+        }
+      } else {
+        handleOpenModal("Error", message);
+        setLoading(false);
+      }
+    } else {
+      handleOpenModal("Error", message);
+      setLoading(false);
+    }
+  }, [verification_post]);
+
   useEffect(() => {
     const globalUser = JSON.parse(getToken());
     const { roles } = globalUser || {};
@@ -175,6 +216,7 @@ const NonVerifiedFamilyData = () => {
         roles.length > 0 &&
         (roles[0] === "Admin" || roles[0] === "Verifying Authority")
     );
+    setIsModalOpen(false);
   }, []);
 
   const handleFilterChange = ({ district, municipal, ward }) => {
@@ -314,19 +356,43 @@ const NonVerifiedFamilyData = () => {
     dispatch(onFamiliesList(queryParams));
   }, []);
 
-  //Testing Working Code
-  const handleSendtoedit = (himParivarId, RationCard) => {
-    console.log("HimParivar ID", himParivarId, "Ration Card", RationCard);
-
-    // Construct the URL with query parameters
-    const queryParam = new URLSearchParams({
-      himParivarId,
-      RationCard,
-    }).toString();
-    router.push(`/edit_modify?${queryParam}`);
+  const handleOpenModal = (title, content) => {
+    setModalMessage({ title, content });
+    setIsModalOpen(true);
   };
 
-  // console.log(familyList, "Asdadadadsafw");
+  //Testing Working Code
+  const handleRollBack = (himParivarId) => {
+    setHimparivarId(himParivarId);
+    handleOpenModal(
+      "Alert",
+      "Are you Sure you want to move Family to Pending Status."
+    );
+    setIsModalOpen(true);
+  };
+
+  const handleProceed = () => {
+    // Handle the logic when the "Proceed" button is clicked
+    console.log("Proceed button clicked!", himParivarId);
+
+    const userId = getUserID();
+
+    try {
+      dispatch(onVerification(null, 1, himParivarId, userId));
+      setLoading(true);
+    } catch (error) {
+      handleOpenModal(
+        "Error",
+        "Error While accessing the network. Please Check your internet Connection and try again."
+      );
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    const isError = modalMessage.title === "Error";
+  };
+
   return (
     <>
       <Layout>
@@ -461,12 +527,11 @@ const NonVerifiedFamilyData = () => {
                                               <Button
                                                 color="error"
                                                 startIcon={<BackHand />}
-                                                // onClick={() =>
-                                                //   handleSendtoedit(
-                                                //     row.himParivarId,
-                                                //     row.rationCardNo
-                                                //   )
-                                                // }
+                                                onClick={() =>
+                                                  handleRollBack(
+                                                    row.himParivarId
+                                                  )
+                                                }
                                               >
                                                 Roll Back
                                               </Button>
@@ -577,6 +642,14 @@ const NonVerifiedFamilyData = () => {
           </>
         </main>
       </Layout>
+
+      <ShowMessageRevoke
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        message={modalMessage}
+        onProceed={handleProceed}
+        himParivarId={himParivarId}
+      />
     </>
   );
 };
