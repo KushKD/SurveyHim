@@ -386,20 +386,12 @@ export default function EditFamily({ onsave, selectedFamily }) {
   // Generic Modal Buttons
 
   const handleProceedModal = () => {
-    // Logic to handle the "Proceed" action when the user clicks the button
-    // You can use the data in modalData (updatedMemberData and changedValues) here
-    // For example, send the data to the server, update state, or perform any other action
     console.log("Proceeding with modal data:", modalData);
     setShowModal(false);
     onsave(modalData);
   };
 
   const handleCancelModal = () => {
-    // Logic to handle the "Cancel" action when the user clicks the button
-    // For example, you might want to reset the changes or perform other actions
-    console.log("Cancelling modal");
-
-    // Close the modal if needed
     setShowModal(false);
   };
 

@@ -34,6 +34,7 @@ import { onFamilyUpdate } from "../network/actions/familyUpdate";
 import Backdrop from "@mui/material/Backdrop";
 import { ErrorOutline, Close } from "@mui/icons-material";
 import ShowMessage from "../components/generic/ShowMessage";
+import { onMemberUpdate } from "../network/actions/memberUpdate";
 
 const EditModify = ({ himMemberID }) => {
   const verificationObject = {
@@ -57,7 +58,8 @@ const EditModify = ({ himMemberID }) => {
   const familiesDetailApi = useSelector((state) => state.familiesDetailApi);
   const verification_post = useSelector((state) => state.verification);
 
-  const familySave = useSelector((state) => state.familySave);
+  const familySave = useSelector((state) => state.saveFamily);
+  const memberSave = useSelector((state) => state.saveMember);
   const [verificationObj, setVerificationObj] = useState(verificationObject);
   useEffect(() => {
     const { himParivarId, RationCard } = router.query;
@@ -73,6 +75,7 @@ const EditModify = ({ himMemberID }) => {
    * ===================================================================================================================
    */
   useEffect(() => {
+    console.log("familySave?.data  UseEffect", familySave?.data);
     const { data, status, message } = familySave?.data || {};
     if (familySave?.data) {
       if (status === "OK" && message === "Success") {
@@ -84,14 +87,42 @@ const EditModify = ({ himMemberID }) => {
           setLoading(false);
         }
       } else {
-        handleOpenModal("Message", message);
+        handleOpenModal("Error", message);
         setLoading(false);
       }
     } else {
-      handleOpenModal("Message", message);
+      handleOpenModal("Error", message);
       setLoading(false);
     }
   }, [familySave]);
+
+  /**
+   * ===================================================================================================================
+   * Update memberSave
+   * UseEffect
+   * ===================================================================================================================
+   */
+  useEffect(() => {
+    console.log("memberSave?.data  UseEffect", memberSave?.data);
+    const { data, status, message } = memberSave?.data || {};
+    if (memberSave?.data) {
+      if (status === "OK" && message === "Success") {
+        if (data) {
+          handleOpenModal("Successfully Updated", data);
+          setLoading(false);
+        } else {
+          handleOpenModal("Error", "Unable to Read the Data from Server");
+          setLoading(false);
+        }
+      } else {
+        handleOpenModal("Error", message);
+        setLoading(false);
+      }
+    } else {
+      handleOpenModal("Error", message);
+      setLoading(false);
+    }
+  }, [memberSave]);
 
   /**
    * ===================================================================================================================
@@ -111,11 +142,11 @@ const EditModify = ({ himMemberID }) => {
           setLoading(false);
         }
       } else {
-        handleOpenModal("Message", message);
+        handleOpenModal("Error", message);
         setLoading(false);
       }
     } else {
-      handleOpenModal("Message", message);
+      handleOpenModal("Error", message);
       setLoading(false);
     }
   }, [verification_post]);
@@ -232,6 +263,44 @@ const EditModify = ({ himMemberID }) => {
    * ===================================================================================================================
    */
 
+  /**
+   * ===================================================================================================================
+   *  Member Save Update Starts
+   * ===================================================================================================================
+   */
+  const handleMemberSave = (modalData) => {
+    const userId = getUserID();
+
+    if (modalData && modalData.updatedData) {
+      modalData.updatedData.userId = userId;
+      modalData.updatedData.himParivarId = selectedFamily.himParivarId;
+      console.log(
+        "updatedMemberData Inside Parent Component",
+        modalData.updatedData
+      );
+      try {
+        dispatch(onMemberUpdate(modalData.updatedData));
+        setLoading(true);
+      } catch (error) {
+        handleOpenModal(
+          "Error",
+          "Error While accessing the network. Please Check your internet Connection and try again."
+        );
+      }
+    } else {
+      handleOpenModal(
+        "Error",
+        "Unable to process the request. Please refresh the page or try agmain later."
+      );
+    }
+  };
+
+  /**
+   * ===================================================================================================================
+   *  Member Save Update Ends
+   * ===================================================================================================================
+   */
+
   return (
     <>
       <Layout>
@@ -274,7 +343,10 @@ const EditModify = ({ himMemberID }) => {
                         style={{ marginBottom: 8 }}
                         key={index}
                       >
-                        <EditMembers memberObject={memberObject} />
+                        <EditMembers
+                          onsave={handleMemberSave}
+                          memberObject={memberObject}
+                        />
                       </Paper>
                     ))}
                   <Divider>&nbsp; &nbsp;</Divider>

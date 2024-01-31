@@ -42,15 +42,13 @@ import { onQualificationsList } from "../../../network/actions/qualifications";
 import { onOccupationList } from "../../../network/actions/occupations";
 import GenericModal from "../../generic/GenericModal";
 
-export default function EditMembers({ memberObject }) {
-
+export default function EditMembers({ onsave, memberObject }) {
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({
     updatedData: {},
     changedValues: {},
     existingData: {},
   });
-
 
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -203,8 +201,6 @@ export default function EditMembers({ memberObject }) {
     }
   }, [occupation_reducer]);
 
- 
-
   const handleViewOrCloseClick = () => {
     setExpanded(!expanded);
     setIsEditMode(false);
@@ -245,11 +241,11 @@ export default function EditMembers({ memberObject }) {
     setSelectedOccupation(initialPropertyData.occupation);
   };
 
-   /**
+  /**
    * Handle Save
    * Save the Edited Data to Service
    */
-   const handleSaveChanges = () => {
+  const handleSaveChanges = () => {
     console.log("Saved changes:", changedValues);
     // Here you can also merge the changes into memberData or send to a server
 
@@ -260,7 +256,7 @@ export default function EditMembers({ memberObject }) {
 
     const updatedMemberData = { ...memberObject, ...changedValues };
     console.log("Updated Member Data:", updatedMemberData);
- 
+
     setShowModal(true);
     setModalData({
       updatedData: updatedMemberData,
@@ -271,17 +267,8 @@ export default function EditMembers({ memberObject }) {
   };
 
   const handleProceedModal = () => {
-    // Logic to handle the "Proceed" action when the user clicks the button
-    // You can use the data in modalData (updatedMemberData and changedValues) here
-    // For example, send the data to the server, update state, or perform any other action
-    console.log("Proceeding with modal data:", modalData);
-
-    // Close the modal if needed
     setShowModal(false);
-
-    /**
-     * Call the Service to Update the Data
-     */
+    onsave(modalData);
   };
 
   const handleCancelModal = () => {

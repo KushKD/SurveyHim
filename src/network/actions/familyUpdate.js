@@ -22,6 +22,7 @@ export const onFamilyUpdate = (familyObject) => {
         "/familyUpdate",
         JSON.stringify(familyObject)
       );
+      console.log("response.data", response.data);
       dispatch(fetchUpdateFamilySuccess(response.data));
     } catch (error) {
       dispatch(fetchUpdateFamilyFailure(error));

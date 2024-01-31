@@ -28,6 +28,7 @@ import surveySummaryRedux from "./surevySummary";
 import rejections from "./rejections";
 import verification from "./verification_reducer";
 import saveFamily from "./saveFamily";
+import saveMember from "./saveMember";
 
 const rootReducer = combineReducers({
   login,
@@ -58,6 +59,7 @@ const rootReducer = combineReducers({
   rejections,
   verification,
   saveFamily,
+  saveMember,
 });
 
 export default rootReducer;
