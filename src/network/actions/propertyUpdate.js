@@ -22,7 +22,7 @@ export const onPropertyUpdate = (propertyObject) => {
     try {
       console.log("property==Sending to Service", propertyObject);
       const response = await axios.post(
-        "/propertyUpdate",
+        "/familyPropertyUpdate",
         JSON.stringify(propertyObject)
       );
       console.log("response.data", response.data);

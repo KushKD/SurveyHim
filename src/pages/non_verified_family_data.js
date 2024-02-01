@@ -365,7 +365,7 @@ const NonVerifiedFamilyData = () => {
   const handleRollBack = (himParivarId) => {
     setHimparivarId(himParivarId);
     handleOpenModal(
-      "Alert",
+      "Confirm",
       "Are you Sure you want to move Family to Pending Status."
     );
     setIsModalOpen(true);
@@ -396,8 +396,6 @@ const NonVerifiedFamilyData = () => {
       if (modalMessage.title === "Alert") {
         // Reload the page if modal title is "Successfully Updated"
         window.location.reload();
-      } else {
-        router.back();
       }
     }
   };

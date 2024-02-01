@@ -17,6 +17,7 @@ const ShowMessageRevoke = ({
   onProceed,
   himParivarId,
 }) => {
+  const isAlertTitle = message.title === "Alert";
   return (
     <Dialog open={open} onClose={onClose} onProceed={onProceed}>
       <DialogTitle
@@ -52,14 +53,25 @@ const ShowMessageRevoke = ({
         >
           Close
         </Button>
-        {/* Add more buttons if needed */}
+        {/* Add more buttons if needed
         <Button
           variant="contained"
           onClick={onProceed} // Handle the action for the "Proceed" button
           color="success"
         >
           Proceed
-        </Button>
+        </Button> */}
+
+        {/* Conditionally render the Proceed button based on the title */}
+        {!isAlertTitle && (
+          <Button
+            variant="contained"
+            onClick={onProceed} // Handle the action for the "Proceed" button
+            color="success"
+          >
+            Proceed
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );
