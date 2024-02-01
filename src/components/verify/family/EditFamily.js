@@ -438,111 +438,68 @@ export default function EditFamily({ onsave, selectedFamily }) {
       switch (key) {
         case "districtName":
           return (
-            <FormControl fullWidth>
-              <InputLabel>{key}</InputLabel>
-              <Select
-                value={selectedDistrictName}
-                label={key}
-                disabled={true}
-                onChange={(e) => {
-                  const newName = e.target.value;
-                  setselectedDistrictName(newName);
-                  const newId =
-                    options.districtName.find(
-                      (option) => option.districtName === newName
-                    )?.districtCode || null;
-                  //console.log("newId", newId);
-                  dispatch(onMunicipalityList(newId));
-                  setChangedValues((prevValues) => ({
-                    ...prevValues,
-                    [key]: { districtCode: newId, districtName: newName },
-                  }));
-                }}
-              >
-                {districtList.map((option) => (
-                  <MenuItem
-                    key={option.districtCode}
-                    value={option.districtName}
-                  >
-                    {option.districtName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <TextField
+              key={key}
+              label={key}
+              value={currentValue}
+              disabled={true}
+              onChange={(e) => {
+                setChangedValues((prevValues) => ({
+                  ...prevValues,
+                  [key]: e.target.value,
+                }));
+              }}
+            />
           );
 
         case "municipalName":
-          // console.log("List", occupationList);
           return (
-            <FormControl fullWidth>
-              <InputLabel>{key}</InputLabel>
-              <Select
-                value={selectedMunicipalityName}
-                label={key}
-                disabled={true}
-                onChange={(e) => {
-                  const newName = e.target.value;
-                  setSelectedMunicipalityName(newName);
-
-                  const newId =
-                    options.municipalName.find(
-                      (option) => option.municipalName === newName
-                    )?.municipalId || null;
-                  dispatch(onWardList(newId));
-                  setChangedValues((prevValues) => ({
-                    ...prevValues,
-                    [key]: {
-                      municipalId: newId,
-                      municipalName: newName,
-                    },
-                  }));
-                }}
-              >
-                {municipalityList.map((option) => (
-                  <MenuItem
-                    key={option.municipalId}
-                    value={option.municipalName}
-                  >
-                    {option.municipalName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <TextField
+              key={key}
+              label={key}
+              value={currentValue}
+              disabled={true}
+              onChange={(e) => {
+                setChangedValues((prevValues) => ({
+                  ...prevValues,
+                  [key]: e.target.value,
+                }));
+              }}
+            />
           );
 
         case "wardName":
           return (
-            <FormControl fullWidth>
-              <InputLabel>{key}</InputLabel>
-              <Select
-                value={selectedWardName}
-                label={key}
-                disabled={true}
-                onChange={(e) => {
-                  const newName = e.target.value;
-                  setSelectedWardName(newName);
-                  const newId =
-                    options.wardName.find(
-                      (option) => option.wardName === newName
-                    )?.id || null;
-                  //console.log("ward id", newId);
-                  setChangedValues((prevValues) => ({
-                    ...prevValues,
-                    [key]: {
-                      id: newId,
-                      wardName: newName,
-                    },
-                  }));
-                }}
-              >
-                {wardList.map((option) => (
-                  <MenuItem key={option.id} value={option.wardName}>
-                    {option.wardName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <TextField
+              key={key}
+              label={key}
+              value={currentValue}
+              disabled={true}
+              onChange={(e) => {
+                setChangedValues((prevValues) => ({
+                  ...prevValues,
+                  [key]: e.target.value,
+                }));
+              }}
+            />
           );
+
+        case "rationCardNo":
+          return (
+            <TextField
+              key={key}
+              label={key}
+              value={currentValue}
+              disabled={currentValue != "" || currentValue != null} // Disable if null, undefined, or empty
+              onChange={(e) => {
+                setChangedValues((prevValues) => ({
+                  ...prevValues,
+                  [key]: e.target.value,
+                }));
+              }}
+            />
+          );
+
         case "economicStatus":
           return (
             <FormControl fullWidth>

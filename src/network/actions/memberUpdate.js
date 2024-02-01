@@ -19,7 +19,7 @@ export const onMemberUpdate = (memberObject) => {
     try {
       console.log("memberObject==Sending to Service", memberObject);
       const response = await axios.post(
-        "/memberUpdate",
+        "/family/member/updateData",
         JSON.stringify(memberObject)
       );
       console.log("response.data", response.data);
