@@ -35,6 +35,7 @@ import Backdrop from "@mui/material/Backdrop";
 import { ErrorOutline, Close } from "@mui/icons-material";
 import ShowMessage from "../components/generic/ShowMessage";
 import { onMemberUpdate } from "../network/actions/memberUpdate";
+import { onPropertyUpdate } from "../network/actions/propertyUpdate";
 
 const EditModify = ({ himMemberID }) => {
   const verificationObject = {
@@ -60,6 +61,7 @@ const EditModify = ({ himMemberID }) => {
 
   const familySave = useSelector((state) => state.saveFamily);
   const memberSave = useSelector((state) => state.saveMember);
+  const propertySave = useSelector((state) => state.saveProperty);
   const [verificationObj, setVerificationObj] = useState(verificationObject);
   useEffect(() => {
     const { himParivarId, RationCard } = router.query;
@@ -123,6 +125,34 @@ const EditModify = ({ himMemberID }) => {
       setLoading(false);
     }
   }, [memberSave]);
+
+  /**
+   * ===================================================================================================================
+   * Update propertySave
+   * UseEffect
+   * ===================================================================================================================
+   */
+  useEffect(() => {
+    console.log("propertySave?.data  UseEffect", propertySave?.data);
+    const { data, status, message } = propertySave?.data || {};
+    if (propertySave?.data) {
+      if (status === "OK" && message === "Success") {
+        if (data) {
+          handleOpenModal("Successfully Updated", data);
+          setLoading(false);
+        } else {
+          handleOpenModal("Error", "Unable to Read the Data from Server");
+          setLoading(false);
+        }
+      } else {
+        handleOpenModal("Error", "message");
+        setLoading(false);
+      }
+    } else {
+      handleOpenModal("Error", "Unable to Read the Data from Server");
+      setLoading(false);
+    }
+  }, [propertySave]);
 
   /**
    * ===================================================================================================================
@@ -301,6 +331,43 @@ const EditModify = ({ himMemberID }) => {
    * ===================================================================================================================
    */
 
+  /**
+   * ===================================================================================================================
+   *  Property Save Update Starts
+   * ===================================================================================================================
+   */
+  const handlePropertySave = (modalData) => {
+    const userId = getUserID();
+
+    if (modalData && modalData.updatedData) {
+      modalData.updatedData.userId = userId;
+      modalData.updatedData.himParivarId = selectedFamily.himParivarId;
+      console.log(
+        "updatedMemberData Inside Parent Component",
+        modalData.updatedData
+      );
+      try {
+        dispatch(onPropertyUpdate(modalData.updatedData));
+        setLoading(true);
+      } catch (error) {
+        handleOpenModal(
+          "Error",
+          "Error While accessing the network. Please Check your internet Connection and try again."
+        );
+      }
+    } else {
+      handleOpenModal(
+        "Error",
+        "Unable to process the request. Please refresh the page or try agmain later."
+      );
+    }
+  };
+  /**
+   * ===================================================================================================================
+   *  Property Save Update Ends
+   * ===================================================================================================================
+   */
+
   return (
     <>
       <Layout>
@@ -359,7 +426,10 @@ const EditModify = ({ himMemberID }) => {
 
                   <Paper elevation={3} variant="elevation">
                     {selectedFamily && (
-                      <EditProperties selectedFamily={selectedFamily} />
+                      <EditProperties
+                        onsave={handlePropertySave}
+                        selectedFamily={selectedFamily}
+                      />
                     )}
                   </Paper>
                   <Divider>&nbsp; &nbsp;</Divider>

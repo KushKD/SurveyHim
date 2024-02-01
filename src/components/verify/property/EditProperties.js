@@ -36,7 +36,7 @@ import { useDispatch } from "react-redux";
 import ConfirmDialogPropertyEdit from "../../dialogs/ConfirmDialogPropertyEdit";
 import GenericModal from "../../generic/GenericModal";
 
-export default function EditProperties({ selectedFamily }) {
+export default function EditProperties({ onsave, selectedFamily }) {
   const [expanded, setExpanded] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -167,17 +167,8 @@ export default function EditProperties({ selectedFamily }) {
   };
 
   const handleProceedModal = () => {
-    // Logic to handle the "Proceed" action when the user clicks the button
-    // You can use the data in modalData (updatedMemberData and changedValues) here
-    // For example, send the data to the server, update state, or perform any other action
-    console.log("Proceeding with modal data:", modalData);
-
-    // Close the modal if needed
     setShowModal(false);
-
-    /**
-     * Call the Service to Update the Data
-     */
+    onsave(modalData);
   };
 
   const handleCancelModal = () => {

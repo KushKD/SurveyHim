@@ -29,6 +29,7 @@ import rejections from "./rejections";
 import verification from "./verification_reducer";
 import saveFamily from "./saveFamily";
 import saveMember from "./saveMember";
+import saveProperty from "./saveProperty";
 
 const rootReducer = combineReducers({
   login,
@@ -60,6 +61,7 @@ const rootReducer = combineReducers({
   verification,
   saveFamily,
   saveMember,
+  saveProperty,
 });
 
 export default rootReducer;

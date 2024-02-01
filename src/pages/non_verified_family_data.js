@@ -191,7 +191,7 @@ const NonVerifiedFamilyData = () => {
     if (verification_post?.data) {
       if (status === "OK" && message === "Success") {
         if (data) {
-          handleOpenModal("Success", data);
+          handleOpenModal("Alert", data);
           setLoading(false);
         } else {
           handleOpenModal("Error", "Unable to Read the Data from Server");
@@ -391,6 +391,15 @@ const NonVerifiedFamilyData = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     const isError = modalMessage.title === "Error";
+
+    if (!isError) {
+      if (modalMessage.title === "Alert") {
+        // Reload the page if modal title is "Successfully Updated"
+        window.location.reload();
+      } else {
+        router.back();
+      }
+    }
   };
 
   return (
