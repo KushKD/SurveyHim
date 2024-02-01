@@ -45,7 +45,7 @@ function Copyright(props) {
     <Typography variant="body2" color="primary" align="center" {...props}>
       {"©"}
       <Link color="inherit" href="www.google.com">
-        2023 Department of Digital Technologies and Governance
+        2024 Department of Digital Technologies and Governance
       </Link>
       {""}
       {/* {new Date().getFullYear()} */}
