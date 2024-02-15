@@ -7,6 +7,7 @@ import Select from "react-select";
 
 import { onMunicipalityList } from "../../network/actions/municipality";
 import { onWardList } from "../../network/actions/wards";
+import { onWardListSurveyor } from "../../network/actions/wards";
 
 export default function Filters({ onChange }) {
   const selectStyles = { menu: (styles) => ({ ...styles, zIndex: 999 }) };
@@ -32,7 +33,11 @@ export default function Filters({ onChange }) {
 
   const [errorList, setErrorList] = useState([]);
 
-  const [selectDisabled, setSelectDisabled] = useState(false);
+  //Disable enable Dropdown
+  const [selectDisabledDistrict, setSelectDisabledDistrict] = useState(false);
+  const [selectDisabledMunicipality, setSelectDisabledMunicipality] =
+    useState(false);
+  const [selectDisabledWard, setSelectDisabledWard] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -45,14 +50,9 @@ export default function Filters({ onChange }) {
   useEffect(() => {
     try {
       const globalUser = JSON.parse(getToken());
-      const { districtDetail, municipalityDetail, ulb, roles } =
+      console.log("Sex", globalUser);
+      const { districtDetail, municipalityDetail, ulb, roles, userName } =
         globalUser || {};
-
-      if (roles[0] == "Admin") {
-        setSelectDisabled(false);
-      } else {
-        setSelectDisabled(true);
-      }
 
       let district_object = {
         label:
@@ -64,14 +64,14 @@ export default function Filters({ onChange }) {
         code: districtDetail.districtCode,
       };
 
-      // console.log(district_object, "district object");
+      console.log(district_object, "district object");
 
       setDistrict(district_object);
       setDistrictId(districtDetail.code);
       if (district_object.code) {
         setMunicipalCalled(true);
-
         dispatch(onMunicipalityList(district_object.code));
+        setSelectDisabledDistrict(true);
       }
 
       let municipality_object = {
@@ -79,14 +79,16 @@ export default function Filters({ onChange }) {
         value: municipalityDetail.municipalId,
       };
 
-      //console.log(municipality_object, "municipality object");
+      console.log(municipality_object, "municipality object");
 
       setMunicipal(municipality_object);
       setMunicipalId(municipalityDetail.id);
 
-      setWardCalled(true);
+      if (municipality_object) {
+        setSelectDisabledMunicipality(true);
+      }
 
-      dispatch(onWardList(municipality_object.value));
+      console.log("ULB:Data", ulb);
 
       if (ulb) {
         let ward_object = {
@@ -96,6 +98,16 @@ export default function Filters({ onChange }) {
         };
 
         setward(ward_object);
+        setSelectDisabledWard(true);
+      }
+
+      if (roles[0] == "Surveyor") {
+        setWardCalled(true);
+        dispatch(onWardListSurveyor(municipality_object.value, userName));
+        setSelectDisabledWard(false);
+      } else {
+        setWardCalled(true);
+        dispatch(onWardList(municipality_object.value));
       }
 
       onChange({
@@ -209,7 +221,7 @@ export default function Filters({ onChange }) {
   }, [ward_reducer]);
 
   const handleDistrictChange = (event) => {
-    //console.log(event, "asdadaas");
+    console.log(event, "asdadaas district event");
     setDistrictId(event);
     setDistrict(event);
     setMunicipal("");
@@ -233,7 +245,24 @@ export default function Filters({ onChange }) {
   const handleWardChange = (event) => {
     setwardId(event);
     setward(event);
-    onChange({ district: districtId, municipal: municipalId, ward: event });
+
+    const globalUser = JSON.parse(getToken());
+    const { districtDetail, municipalityDetail, ulb, roles, userName } =
+      globalUser || {};
+
+    if (districtId === undefined || municipalId === undefined) {
+      onChange({
+        district:
+          districtId !== undefined ? districtId : districtDetail.districtCode,
+        municipal:
+          municipalId !== undefined
+            ? municipalId
+            : municipalityDetail.municipalId,
+        ward: event,
+      });
+    } else {
+      onChange({ district: districtId, municipal: municipalId, ward: event });
+    }
   };
 
   return (
@@ -253,7 +282,7 @@ export default function Filters({ onChange }) {
             value={district}
             options={districtList}
             onChange={handleDistrictChange}
-            isDisabled={selectDisabled}
+            isDisabled={selectDisabledDistrict}
           />
         </Grid>
 
@@ -271,7 +300,7 @@ export default function Filters({ onChange }) {
             value={municipal}
             options={municipalityList}
             onChange={handleMunicipalityChange}
-            isDisabled={selectDisabled}
+            isDisabled={selectDisabledMunicipality}
           />
         </Grid>
 
@@ -289,7 +318,7 @@ export default function Filters({ onChange }) {
             value={ward}
             options={wardList}
             onChange={handleWardChange}
-            isDisabled={selectDisabled}
+            isDisabled={selectDisabledWard}
           />
         </Grid>
       </Grid>

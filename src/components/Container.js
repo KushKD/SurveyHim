@@ -169,10 +169,8 @@ const Dashboard = () => {
    * Dashboard Object
    */
   const [surveyInfo, setSurveyInfo] = useState([]);
-  const [verificationInfoList, setVerificationInfoList] = useState([]); 
-  const [aadhaarEkycInfoList, setAadhaarEkycInfoList] = useState([]); 
-
-
+  const [verificationInfoList, setVerificationInfoList] = useState([]);
+  const [aadhaarEkycInfoList, setAadhaarEkycInfoList] = useState([]);
 
   const dispatch = useDispatch();
   const dashboardFilterState = useSelector(
@@ -196,11 +194,20 @@ const Dashboard = () => {
     selectedWard
   ) => {
     const queryParams = {};
-
-    if (selectedDistrict) queryParams.districtId = selectedDistrict.code;
-    if (selectedMunicipality)
-      queryParams.municipalId = selectedMunicipality.value;
+    queryParams.districtId =
+      selectedDistrict &&
+      selectedDistrict.code !== null &&
+      selectedDistrict.code !== undefined
+        ? selectedDistrict.code
+        : selectedDistrict;
+    queryParams.municipalId =
+      selectedMunicipality &&
+      selectedMunicipality.value !== null &&
+      selectedMunicipality.value !== undefined
+        ? selectedMunicipality.value
+        : selectedMunicipality;
     if (selectedWard) queryParams.wardId = selectedWard.value;
+    console.log("queryParams", queryParams);
     return queryParams;
   };
 
@@ -283,59 +290,6 @@ const Dashboard = () => {
     }
   }, [dashboardFilterState]);
 
-  /** Filter Component Finishes */
-
-  // const onSearchChange = (searchQuery) => {
-  //   setSearch(searchQuery);
-  // };
-
-  // const handleCardClick = () => {
-  //   setCardClicked(!isCardClicked);
-  // };
-
-  // async function searchRationCard() {
-  //   dispatch(onFamiliesList(0, props.wardId));
-  // }
-
-  // const handleChangePage = (event, newPage) => {
-  //   setPage(newPage);
-  // };
-
-  // const handleChangeRowsPerPage = (event) => {
-  //   setRowsPerPage(+event.target.value);
-  //   setPage(0);
-  // };
-
-  // useEffect(() => {
-  //   if (familiesDetailApi?.data && detailCalled) {
-  //     const { data, status, message, rationCardAlreadyExists } =
-  //       familiesList.data || {};
-  //     setShowModal(true);
-  //     // setrationList(data);
-
-  //     setselectedFamily(familiesDetailApi.data);
-  //     setdetailCalled(false);
-  //   }
-  // }, [familiesDetailApi]);
-
-  // useEffect(() => {
-  //   if (familiesList?.data) {
-  //     const { data, status, message, rationCardAlreadyExists } =
-  //       familiesList.data || {};
-  //     dispatch(onShowLoader(false));
-
-  //     // setrationList(data);
-  //     setfamilyList(familiesList.data);
-  //   }
-  // }, [familiesList]);
-
-  // useEffect(() => {
-  //   dispatch(onShowLoader(true));
-  //   if (props.wardId !== 0) {
-  //     dispatch(onFamiliesList(0, 45));
-  //   }
-  // }, []);
-
   return (
     <>
       <Filters onChange={handleFilterChange} />
@@ -398,7 +352,7 @@ const Dashboard = () => {
           </>
         )}
 
-{aadhaarEkycInfoList.length > 0 && (
+        {aadhaarEkycInfoList.length > 0 && (
           <>
             <Box
               style={{ background: "#074465", color: "#FFF", borderRadius: 6 }}

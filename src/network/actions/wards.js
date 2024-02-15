@@ -24,3 +24,18 @@ export const onWardList = (id) => {
     }
   };
 };
+
+export const onWardListSurveyor = (municipalityID, userName) => {
+  return async (dispatch) => {
+    try {
+      const response = await axios.get(
+        `getWards?municipalId=${municipalityID}&userName=${userName}`,
+        {}
+      );
+
+      dispatch(fetchWardSuccess(response.data));
+    } catch (error) {
+      dispatch(fetchWardFailure(error));
+    }
+  };
+};
