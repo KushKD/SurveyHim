@@ -198,8 +198,11 @@ const EditModify = ({ himMemberID }) => {
     const isAnyMemberNotVerified = selectedFamily?.members.some(
       (member) => !member.isEkycVerfied
     );
+    console.log(
+      selectedFamily?.members.some((member) => !member.isEkycVerfied)
+    );
     const userId = getUserID();
-    if (isAnyMemberNotVerified) {
+    if (!isAnyMemberNotVerified) {
       // Display alert if any member's eKYC is not verified
       handleOpenModal(
         "Error",

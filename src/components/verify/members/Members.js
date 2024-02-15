@@ -130,7 +130,7 @@ export default function Members({ memberObject }) {
                     </Typography>
                   </Box>
                   <Box style={{ textAlign: "center" }}>
-                    {memberObject.isEkycVerfied ? (
+                    {memberObject.isEkycVerified ? (
                       <Chip
                         icon={<DoneAll fontSize="small" color="success" />}
                         label="Verified"

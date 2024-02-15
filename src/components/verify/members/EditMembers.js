@@ -549,19 +549,21 @@ export default function EditMembers({ onsave, memberObject }) {
                     </Typography>
                   </Box>
                   <Box style={{ textAlign: "center" }}>
-                    {memberObject.isEkycVerfied ? (
-                      <Chip
-                        icon={<DoneAll fontSize="small" color="success" />}
-                        label="Verified"
-                        style={{ height: 20 }}
-                      />
-                    ) : (
-                      <Chip
-                        icon={<Error color="error" fontSize="small" />}
-                        label="Not Verified"
-                        style={{ height: 20 }}
-                      />
-                    )}
+                    <Box style={{ textAlign: "center" }}>
+                      {memberObject.isEkycVerified ? (
+                        <Chip
+                          icon={<DoneAll fontSize="small" color="success" />}
+                          label="Verified"
+                          style={{ height: 20 }}
+                        />
+                      ) : (
+                        <Chip
+                          icon={<Error color="error" fontSize="small" />}
+                          label="Not Verified"
+                          style={{ height: 20 }}
+                        />
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               </AccordionSummary>
