@@ -25,8 +25,11 @@ import {
   EditAttributesRounded,
   EditAttributesTwoTone,
   Error,
+  ErrorOutline,
   ExpandMore,
+  FileDownload,
   More,
+  PictureInPicture,
   RemoveRedEye,
   Save,
   Update,
@@ -79,6 +82,14 @@ export default function EditMembers({ onsave, memberObject }) {
   const [initialPropertyData, setInitialPropertyData] = useState({});
 
   const [currentDisplayData, setCurrentDisplayData] = useState({});
+
+  const [showModalImage, setShowModalImage] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  const [enlarged, setEnlarged] = useState(false);
+
+  const handleToggleEnlarged = () => {
+    setEnlarged(!enlarged);
+  };
 
   useEffect(() => {
     setEditableMemberObject({ memberObject });
@@ -239,6 +250,16 @@ export default function EditMembers({ onsave, memberObject }) {
     setSelectedRelationName(initialPropertyData.relation);
     setSelectedQualification(initialPropertyData.educationQualification);
     setSelectedOccupation(initialPropertyData.occupation);
+  };
+
+  /**
+   * View Image
+   */
+  const handleViewAadhaarDocument = (currentValue) => {
+    // Logic to show Aadhaar image on button click
+    // For example, set the image URL and open the modal
+    setImageUrl(currentValue);
+    setShowModalImage(true);
   };
 
   /**
@@ -486,6 +507,69 @@ export default function EditMembers({ onsave, memberObject }) {
               }}
             />
           );
+        case "aadhaarDocument":
+          if (currentValue) {
+            return (
+              <div>
+                <img
+                  src={currentValue}
+                  alt="Aadhaar Document"
+                  style={{ height: "200px", width: "auto" }} // Set height to 200 pixels and let the width adjust automatically
+                  onClick={handleToggleEnlarged} // Toggle the enlarged state on click
+                />
+                {enlarged && currentValue && (
+                  <div
+                    className="modal"
+                    onClick={handleToggleEnlarged}
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "rgba(0, 0, 0, 0.7)", // Semi-transparent black background
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 999, // Set the z-index value to control the stacking order
+                    }}
+                  >
+                    <div
+                      className="modal-content"
+                      style={{
+                        position: "relative",
+                      }}
+                    >
+                      <span
+                        className="close"
+                        style={{
+                          position: "absolute",
+                          top: "10px",
+                          right: "10px",
+                          color: "white",
+                          fontSize: "24px",
+                          cursor: "pointer",
+                        }}
+                        onClick={handleToggleEnlarged}
+                      >
+                        &times;
+                      </span>
+                      <img
+                        src={currentValue}
+                        alt="Aadhaar Document"
+                        style={{
+                          maxHeight: "80vh",
+                          maxWidth: "80vw",
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          } else {
+            return null; // If aadhaarImageUrl is null, don't render anything
+          }
         default:
           return (
             <TextField
@@ -557,11 +641,36 @@ export default function EditMembers({ onsave, memberObject }) {
                           style={{ height: 20 }}
                         />
                       ) : (
-                        <Chip
-                          icon={<Error color="error" fontSize="small" />}
-                          label="Not Verified"
-                          style={{ height: 20 }}
-                        />
+                        <>
+                          <Chip
+                            icon={<Error color="error" fontSize="small" />}
+                            label="Not Verified"
+                            style={{ height: 20 }}
+                          />
+                          {memberObject.aadhaarDocument ? (
+                            <Chip
+                              icon={
+                                <PictureInPicture
+                                  fontSize="small"
+                                  color="success"
+                                />
+                              }
+                              label="Document Attached"
+                              style={{ height: 20 }}
+                            />
+                          ) : (
+                            <Chip
+                              icon={
+                                <ErrorOutline
+                                  fontSize="small"
+                                  color="success"
+                                />
+                              }
+                              label="Document Not Attached"
+                              style={{ height: 20 }}
+                            />
+                          )}
+                        </>
                       )}
                     </Box>
                   </Box>
@@ -652,6 +761,9 @@ export default function EditMembers({ onsave, memberObject }) {
             >
               {Object.entries(currentDisplayData).map(([key, value]) => {
                 if (key === "himMemberId") return null; // Skip rendering for "himMemberId"
+                if (key === "isActive") return null;
+                if (key === "isEkycVerified") return null;
+                if (value === null) return null; // Hide the key if the value is null
 
                 return (
                   <Box
@@ -704,6 +816,69 @@ export default function EditMembers({ onsave, memberObject }) {
                         })
                       ) : key === "aadhaarNumber" ? (
                         `XXXX-XXXX-${value.toString().slice(-4)}`
+                      ) : key === "aadhaarDocument" ? (
+                        <div>
+                          {value && (
+                            <img
+                              src={value}
+                              alt="Aadhaar Document"
+                              style={{
+                                height: "200px",
+                                width: "auto",
+                                cursor: "pointer",
+                              }}
+                              onClick={handleToggleEnlarged}
+                            />
+                          )}
+                          {enlarged && value && (
+                            <div
+                              className="modal"
+                              onClick={handleToggleEnlarged}
+                              style={{
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                backgroundColor: "rgba(0, 0, 0, 0.7)", // Semi-transparent black background
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                zIndex: 100, // Set the z-index value to control the stacking order
+                              }}
+                            >
+                              <div
+                                className="modal-content"
+                                style={{
+                                  position: "relative",
+                                }}
+                              >
+                                <span
+                                  className="close"
+                                  style={{
+                                    position: "absolute",
+                                    top: "10px",
+                                    right: "10px",
+                                    color: "white",
+                                    fontSize: "24px",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={handleToggleEnlarged}
+                                >
+                                  &times;
+                                </span>
+                                <img
+                                  src={value}
+                                  alt="Aadhaar Document"
+                                  style={{
+                                    maxHeight: "80vh",
+                                    maxWidth: "80vw",
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       ) : typeof value === "boolean" ? (
                         value ? (
                           <Chip
@@ -749,6 +924,18 @@ export default function EditMembers({ onsave, memberObject }) {
         onCancel={handleCancelModal}
         parentClass="Member"
       />
+
+      {/* Image Pop Up*/}
+      {showModalImage && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={() => setShowModalImage(false)}>
+              &times;
+            </span>
+            <img src={imageUrl} alt="Aadhaar Document" />
+          </div>
+        </div>
+      )}
     </>
   );
 }

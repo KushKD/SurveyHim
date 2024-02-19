@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -27,8 +27,15 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import HomeIcon from "@mui/icons-material/Home";
 import Loading from "../Loader";
-import { getToken, removeToken, getUserName, getUlb } from "../../utils/cookie";
+import {
+  getToken,
+  removeToken,
+  getUserName,
+  getUlb,
+  getRoles,
+} from "../../utils/cookie";
 import { Verified } from "@mui/icons-material";
+import { set } from "lodash";
 
 const drawerWidth = 260;
 
@@ -60,7 +67,10 @@ function Layout(props) {
 
   const [username, setUsername] = React.useState("");
 
+  const [role, setRole] = useState("");
+
   let globalUserName = "";
+  let globalRole = "";
 
   useEffect(() => {
     if (getUserName()) {
@@ -70,6 +80,15 @@ function Layout(props) {
     if (globalUserName) {
       setUsername(globalUserName);
     }
+    console.log("Roles===", getRoles());
+    if (getRoles()) {
+      globalRole = getRoles();
+    }
+
+    if (globalRole) {
+      setRole(globalRole);
+    }
+
     // const getUlbData = getUlb();
   }, []);
 
@@ -97,47 +116,33 @@ function Layout(props) {
     <div style={{}}>
       <Toolbar>
         <Image src={AppLogo} width={65} height={50} alt="Logo" />
-
         <Typography variant="h6" noWrap component="div" marginLeft={2}>
           Family Survey
           <br /> (Urban)
         </Typography>
       </Toolbar>
 
-      {/* <Toolbar /> */}
-      {/* <Divider /> */}
       <List style={{ marginTop: 20 }}>
-        {[
-          "Dashboard",
-          "Survey Summary",
-          "View Edit Data",
-          "Verified Family Data",
-          "Non Verified Family Data",
-        ].map((text, index) => (
+        {getOptionsForRole(role).map((option, index) => (
           <ListItem
-            key={text}
+            key={option.text}
             disablePadding
             sx={{
-              borderRight: pathName.startsWith("/" + text.toLowerCase())
-                ? "4px solid #074465   "
+              borderRight: pathName.startsWith("/" + option.route.toLowerCase())
+                ? "4px solid #074465"
                 : "0px solid #FFFFFF",
             }}
             className={
-              pathName.startsWith("/" + text.toLowerCase())
+              pathName.startsWith("/" + option.route.toLowerCase())
                 ? " text-[#074465] bg-[#f2f5f9] bg-white"
                 : "text-slate-700"
             }
-            // style={{ color: pathName.startsWith("/" + text.toLowerCase()) ? "text-sky-600 bg-slate-100" : "text-slate-700" }}
-
-            onClick={() =>
-              router.push("/" + text.replace(/\s/g, "_").toLowerCase())
-            }
+            onClick={() => router.push("/" + option.route)}
           >
             <ListItemButton>
               <ListItemIcon
-                // className={pathName.startsWith("/" + text.toLowerCase()) ? "bg-[#e6f5ff] bg-white" : "text-slate-700"}
                 className={
-                  pathName.startsWith("/" + text.toLowerCase())
+                  pathName.startsWith("/" + option.route.toLowerCase())
                     ? "text-[#074465]"
                     : "text-slate-700"
                 }
@@ -146,53 +151,69 @@ function Layout(props) {
               </ListItemIcon>
               <ListItemText
                 sx={{
-                  transition: "color 0.3s", // Add a smooth color transition effect
+                  transition: "color 0.3s",
                   "&:hover": {
-                    color: "#074465", // Change the text color on hover
+                    color: "#074465",
                   },
                 }}
                 primaryTypographyProps={{ fontSize: "14px" }}
-                primary={text}
+                primary={option.text}
               />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
+
       <Divider />
-      {/* <List>
-        {["About Us", "Contact Us"].map((text, index) => (
-          <ListItem
-            key={text}
-            disablePadding
-            className={
-              pathName.startsWith("/" + text.toLowerCase())
-                ? " text-[#074465] bg-[#f2f5f9] bg-white"
-                : "text-slate-700"
-            }
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-
-              <ListItemText
-                sx={{
-                  transition: "color 0.3s", // Add a smooth color transition effect
-                  "&:hover": {
-                    color: "#074465", // Change the text color on hover
-                  },
-                }}
-                primaryTypographyProps={{ fontSize: "14px" }}
-                primary={text}
-              />
-
-              
-            </ListItemButton>
-          </ListItem> */}
-      {/* ))}
-      </List> */}
     </div>
   );
+
+  // Define function to get options based on user role
+  function getOptionsForRole(role) {
+    switch (role) {
+      case "Admin":
+        return [
+          { text: "Dashboard", route: "dashboard" },
+          { text: "Survey Summary", route: "survey_summary" },
+          { text: "View/Edit Data", route: "view_edit_data" },
+          { text: "Verified Family Data", route: "verified_family_data" },
+          {
+            text: "Non Verified Family Data",
+            route: "non_verified_family_data",
+          },
+        ];
+      case "Surveyor":
+        return [
+          { text: "Dashboard", route: "dashboard" },
+          { text: "Survey Summary", route: "survey_summary" },
+          { text: "View Data", route: "view_edit_data" },
+        ];
+      case "Verifying Authority":
+        return [
+          { text: "Dashboard", route: "dashboard" },
+          { text: "Survey Summary", route: "survey_summary" },
+          { text: "View/Edit Data", route: "view_edit_data" },
+          { text: "Verified Family Data", route: "verified_family_data" },
+          {
+            text: "Non Verified Family Data",
+            route: "non_verified_family_data",
+          },
+        ];
+      case "Viewing Authority":
+        return [
+          { text: "Dashboard", route: "dashboard" },
+          { text: "Survey Summary", route: "survey_summary" },
+          { text: "View Data", route: "view_edit_data" },
+          { text: "Verified Family Data", route: "verified_family_data" },
+          {
+            text: "Non Verified Family Data",
+            route: "non_verified_family_data",
+          },
+        ];
+      default:
+        return [];
+    }
+  }
 
   const container =
     window !== undefined ? () => window().document.body : undefined;

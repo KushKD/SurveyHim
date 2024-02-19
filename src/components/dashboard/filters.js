@@ -50,7 +50,6 @@ export default function Filters({ onChange }) {
   useEffect(() => {
     try {
       const globalUser = JSON.parse(getToken());
-      console.log("Sex", globalUser);
       const { districtDetail, municipalityDetail, ulb, roles, userName } =
         globalUser || {};
 
